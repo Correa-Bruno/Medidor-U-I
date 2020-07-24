@@ -1,0 +1,27 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.1.57</VERSION>
+ <DEVICE>"ATmega328P"</DEVICE>
+ <WORKING_DIR>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include\m328Pdef.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Debug/Medidor de U  I.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>Medidor de U  I.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>Medidor de U  I.map</FILE>
+  <FILE>Medidor de U  I.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <N_T0_OVF><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>11</LINE></N_T0_OVF>
+  <INICIO><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>24</LINE></INICIO>
+ </LABELS>
+</ASSEMBLER_INFO>
