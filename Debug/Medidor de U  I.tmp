@@ -21,12 +21,20 @@
   <FILE>Medidor de U  I.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <VAL_PWMA><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>10</LINE></VAL_PWMA>
-  <VAL_PWMB><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>11</LINE></VAL_PWMB>
-  <INICIO><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>30</LINE></INICIO>
-  <RTI_TIMER1_OVF><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>110</LINE></RTI_TIMER1_OVF>
-  <RTI_ADC><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>71</LINE></RTI_ADC>
-  <TRUE1><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>93</LINE></TRUE1>
-  <TRUE2><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>101</LINE></TRUE2>
+  <VAL_PWMAH><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>10</LINE></VAL_PWMAH>
+  <VAL_PWMAL><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>11</LINE></VAL_PWMAL>
+  <VAL_PWMBH><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>12</LINE></VAL_PWMBH>
+  <VAL_PWMBL><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>13</LINE></VAL_PWMBL>
+  <INICIO><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>43</LINE></INICIO>
+  <RTI_TIMER1_OVF><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>155</LINE></RTI_TIMER1_OVF>
+  <RTI_ADC><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>116</LINE></RTI_ADC>
+  <RTI_PCINT0><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>174</LINE></RTI_PCINT0>
+  <Retardo_20ms><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>100</LINE></Retardo_20ms>
+  <WGLOOP0><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>103</LINE></WGLOOP0>
+  <WGLOOP1><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>104</LINE></WGLOOP1>
+  <WGLOOP2><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>105</LINE></WGLOOP2>
+  <TRUE1><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>131</LINE></TRUE1>
+  <TRUE2><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>141</LINE></TRUE2>
+  <SALIDA><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>151</LINE></SALIDA>
  </LABELS>
 </ASSEMBLER_INFO>
