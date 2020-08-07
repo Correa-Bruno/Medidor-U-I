@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm Fri Jul 31 16:50:57 2020
+AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm Fri Aug 07 11:10:38 2020
 
 [builtin](2): Including file 'C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include\m328Pdef.inc'
                  
@@ -982,189 +982,370 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
                  
                  ; ***** END OF FILE ******************************************************
                  
-                  * Medidor_de_U__I.asm
+                  * MULTIMEDIDOR DE CC
                   *
-                  *  Created: 24/7/2020 09:20:33
-                  *   Author: Bruno
+                  * 
+                  *   Author: De Battista Cristian y Errecart Matias
+                  *	 Oyente por Zoom: Correa Bruno, Alias "el arruinau"
                   */ 
-                  //hola gatos
+                  ;########################################################################################################################################## 
+                  ;############################################################### DECLARACION ##############################################################
+                  ;##########################################################################################################################################
+                 
+                 .def	RestoL=r14
+                 .def	RestoH=r15
+                 .def	DividendoL=r16
+                 .def	DividendoH=r17
+                 .def	DivisorL=r18
+                 .def	DivisorH=r19
+                 .def	Contador=r20
+                 
                  .DSEG
                  .ORG 0x100
-000100           	VAL_PWMAH: .Byte 1
-000101           	VAL_PWMAL: .Byte 1
-000102           	VAL_PWMBH: .Byte 1
-000103           	VAL_PWMBL: .Byte 1
+000100           	VAL_TensionADCH: .Byte 1
+000101           	VAL_TensionADCL: .Byte 1
+000102           	VAL_CorrienteADCH: .Byte 1
+000103           	VAL_CorrienteADCL: .Byte 1
+000104           	RES_MULH: .Byte 1
+000105           	RES_MULL: .Byte 1
+000106           	TensionH: .Byte 1
+000107           	TensionL: .Byte 1
+000108           	PotenciaH: .Byte 1
+000109           	PotenciaL: .Byte 1
+00010a           	CorrienteH: .Byte 1
+00010b           	CorrienteL: .Byte 1
+                 	
                  .ORG 0x110
                  	.MACRO	PUSH_SREG
+                 			push r13
+                 			in r13, SREG
+                 			push r13
+                 			push r14
+                 			push r15
+                 			push r16
+                 			push r17
+                 			push r18
+                 			push r19
                  			push r20
-                 			in r20, sreg		;guardo en la pila la posicion de memoria
-                 			push r20
+                 			push r21
+                 			push r22
+                 			push r23
+                 			push r24
+                 			push r25
+                 					;guardo en la pila la posicion de memoria
                  	.ENDMACRO
                  .ORG 0x120
                  	.MACRO	POP_SREG
+                 			pop r25
+                 			pop r24
+                 			pop r23
+                 			pop r22
+                 			pop r21
                  			pop r20
-                 			out sreg, r20		;recupero de la pila la posicion de memoria
-                 			pop r20
+                 			pop r19
+                 			pop r18
+                 			pop r17
+                 			pop r16
+                 			pop r15
+                 			pop r14
+                 			pop r13
+                 			out sreg, r13		;recupero de la pila la posicion de memoria
+                 			pop r13
                  	.ENDMACRO
+                 
+                 ;########################################################## VECTORES DE INTERRUPCION #########################################################
+                 
                  .CSEG
                  .ORG 0x00
-000000 940c 0101 	jmp INICIO
+000000 940c 0035 	jmp INICIO
                  
-                 .ORG 0x20
-000020 940c 015c 	jmp RTI_TIMER1_OVF
+                 .ORG 0x0006
+000006 940c 0096 	jmp RTI_PCINT0
+                 	
+                 .ORG 0x001A
+00001a 940c 0067 	jmp RTI_TIMER1_OVF
                  
                  .ORG 0x34
-000034 940c 0132 	jmp RTI_ADC
+000034 9518      	reti
+                 ;################################################################################################################################## 
+                 ;########################################################## CONFIGURACION #########################################################
+                 ;##################################################################################################################################
                  
-                 .ORG 0x55
-000055 940c 0177 	jmp RTI_PCINT0
+                 	INICIO:
                  
-                 .ORG 0x100
-000100 9518      	reti
+000035 e008      		ldi r16, high(ramend)  ;conf pila
+000036 bf0e      		out sph, r16
+000037 ef0f      		ldi r16, low(ramend)
+000038 bf0d      		out spl, r16
                  
+                 ;########################################################## CONFIGURACION ADC #########################################################
                  
-                 INICIO:
+000039 e003      		ldi r16, (1<<ADC1D)|(1<<ADC0D)	;descativo entrada digital de los pines ADC0 y ADC1
+00003a 9300 007e 		sts DIDR0, r16
                  
-000101 e008      		ldi r16, high(ramend)  ;conf pila
-000102 bf0e      		out sph, r16
-000103 ef0f      		ldi r16, low(ramend)
-000104 bf0d      		out spl, r16
+                 ;########################################################## CONFIGURACION  de PINES y PCINT0 #########################################################
                  
-000105 ea0b      		ldi r16, (1<<ADEN)|(1<<ADIE)|(1<<ADATE)|(0<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
-000106 9300 007a 		sts ADCSRA, r16 
-000108 e006      		ldi r16, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
-000109 9300 007b 		sts ADCSRB, r16
-                 		/*ldi r16, (1<<ADC1D)|(1<<ADC0D)	;descativo entrada digital de los pines ADC0 y ADC1
-                 		sts DIDR0, r16*/
+00003c e000      		ldi r16, (0<<PB3)|(0<<PB4)|(0<<PB5)				; pines como entrada interrupcion de PCIE0
+00003d b904      		out DDRB,r16
+00003e e308      		ldi r16, (1<<PORTB3)|(1<<PORTB4)|(1<<PORTB5)	; Resistencias Pull Up
+00003f b905      		out PORTB, r16
+000040 e001      		ldi r16, (1<<PCIE0)			;habilito int por cambio de pines[7:0] (PCIE0)
+000041 9300 0068 		sts PCICR, r16
+000043 e308      		ldi r16, 0b0011_1000		;habilito los 3 pines de interrupcion (PB 3-4-5)
+000044 9300 006b 		sts PCMSK0, r16
                  
-00010b e600      		ldi r16, (0<<REFS1)|(1<<REFS0)|(1<<ADLAR)	;selec voltaje de referencia ADC, ajusto el resultado a la izquiera
-00010c 9300 007c 		sts ADMUX, r16
+000046 e006      		ldi r16, (1<<PB1)|(1<<PB2)  ;como salida PB1(OC1A) y PB2(OC1B) PWM
+000047 b904      		out DDRB, r16
+                 
+000048 e600      		ldi r16, (1<<PD5)|(1<<PD6)	; enciendo led prueba interrupcion externa PCEI0
+000049 b90a      		out DDRD, r16
+                 
+                 ;########################################################## CONFIGURACION DE TIMER/COMP 1 #########################################################
                  		
-00010e e000      		ldi r16, (0<<PB3)|(0<<PB4)|(0<<PB5)				; pines como entrada interrupcion de PCIE0
-00010f b904      		out DDRB,r16
-000110 e308      		ldi r16, (1<<PORTB3)|(1<<PORTB4)|(1<<PORTB5)	; Resistencias Pull Up
-000111 b905      		out PORTB, r16
-000112 e001      		ldi r16, 0b0000_0001		;habilito int por cambio de pines[7:0] (PCIE0)
-000113 9300 0068 		sts PCICR, r16
-000115 e308      		ldi r16, 0b0011_1000		;habilito los 3 pines de interrupcion (PB 3-4-5)
-000116 9300 006b 		sts PCMSK0, r16
+00004a ea03      		ldi r16, (1<<COM1A1)|(0<<COM1A0)|(1<<COM1B1)|(0<<COM1B0)|(1<<WGM11)|(1<<WGM10) ; modo fase correcta PWM, comparacion igual no invertido, resolucion 10-bit
+00004b 9300 0080 		sts TCCR1A, r16
+00004d e00a      		ldi r16, (1<<WGM12)|(0<<WGM13)|(0<<CS12)|(1<<CS11)|(0<<CS10)  ;selector de reloj de timer/counter: Clock_I-O/8(from prescaler)
+00004e 9300 0081 		sts TCCR1B, r16
                  
-000118 e006      		ldi r16, (1<<PB1)|(1<<PB2)  ;como salida PB1(OC1A) y PB2(OC1B) PWM
-000119 b904      		out DDRB, r16
-                 
-00011a e600      		ldi r16, (1<<PD5)|(1<<PD6)	; enciendo led prueba interrupcion externa PCEI0
-00011b b90a      		out DDRD, r16
-                 
-00011c ea03      		ldi r16, (1<<COM1A1)|(1<<COM1B1)|(0<<COM1A0)|(0<<COM1B0)|(1<<WGM11)|(1<<WGM10) ; modo fast PWM, comparacion igual no invertido 
-00011d 9300 0080 		sts TCCR1A, r16
-00011f e00a      		ldi r16, (1<<WGM12)|(0<<WGM13)|(0<<CS12)|(1<<CS11)|(0<<CS10)  ;selector de reloj de timer/counter: Clock_I-O/8(from prescaler)
-000120 9300 0081 		sts TCCR1B, r16
-                 
-000122 e001      		ldi r16, (1<<TOIE1)		;interrupcion de salida del temporizador/contador  
-000123 9300 006f 		sts TIMSK1, r16
+000050 e001      		ldi r16, (1<<TOIE1)		;interrupcion de salida del temporizador/contador  
+000051 9300 006f 		sts TIMSK1, r16
                  		
-000125 9478      		SEI
+000053 e000      		ldi r16, 0x00
+000054 9300 0089 		sts OCR1AH, r16
+000056 9300 0088 		sts OCR1AL, r16
+000058 9300 008b 		sts OCR1BH, r16
+00005a 9300 008a 		sts OCR1BL, r16
+                 		
+00005c 9478      		SEI
                  
-                 		/*
+                 ;################################################################################################################################## 
+                 ;############################################################# PROGRAMA ###########################################################
+                 ;##################################################################################################################################
+                 
+                 ;########################################################## BUCLE PRINCIPAL #########################################################
+                 		
                  		BUCLE:
-                 			sbic PINB,PINB5		; preg si PINB2=0
-                 			RJMP BUCLE			; si es F retorna a BUCLE	
-                 			CALL Retardo_20ms	;si es V espera 20ms
-                 			sbic PINB,PINB5		;preg si PINBB=0
-                 			rjmp BUCLE			;si es F retorna BUCLE
-                 			sbi PIND,PIND6		;si es V prendo LED
-                 				
-                 		RETENCION:
+00005d 940e 00b7 			call ADC0
+00005f 940e 00cd 			call ADC1
+000061 940e 00e3 			call CALCULO_TENSION
+000063 940e 0104 			call CALCULO_CORRIENTE
+000065 940c 005d 			jmp BUCLE
                  
-                 			sbic PINB,PINB5		;preg si PIND2=0
-                 			rjmp BUCLE			;si es F retorna BUCLE
-                 			rjmp RETENCION		;si es V espera el cambio
-                 		*/
-                 		Retardo_20ms:
+                 ;########################################################## TRATAMIENTO DE INTERRUPCION DEL TIMER1 (salidas PWM 1-5 V) #########################################################
                  
-000126 e216      			ldi  R17, $26
-000127 e127        WGLOOP0:  ldi  R18, $17
-000128 e739        WGLOOP1:  ldi  R19, $79
-000129 953a        WGLOOP2:  dec  R19
-00012a f7f1      			brne WGLOOP2
-00012b 952a      			dec  R18
-00012c f7d9      			brne WGLOOP1
-00012d 951a      		    dec  R17
-00012e f7c1      		    brne WGLOOP0
-00012f 0000      		    nop
-000130 0000      		    nop
-                 
-000131 9508      		    RET
-                 
-                 		RTI_ADC:
-000132 934f
-000133 b74f
-000134 934f      			PUSH_SREG					;guardo en la pila la posicion de memoria
-                 			.DEF CANAL0=r16
-                 			.DEF CANAL1=r17
-                 
-000135 9100 007c 			lds CANAL0, ADMUX			;leo el registro ADEMUX para seleccionar canal
-000137 9110 007c 			lds CANAL1, ADMUX
-000139 7007      			ANDI CANAL0, 0b0111
-00013a 7f10      			ANDI CANAL1, 0b1111_0000	; mascara para leer canal
-                 			 
-00013b 3000      			cpi CANAL0, 0				;si es igual al canal ADC0
-00013c f011      			breq TRUE1
-00013d 3001      			cpi CANAL0, 1				;si es igual al canal ADC1
-00013e f061      			breq TRUE2
-                 
-                 		TRUE1: 
+                 		RTI_TIMER1_OVF:			
+000067 92df
+000068 b6df
+000069 92df
+00006a 92ef
+00006b 92ff
+00006c 930f
+00006d 931f
+00006e 932f
+00006f 933f
+000070 934f
+000071 935f
+000072 936f
+000073 937f
+000074 938f
+000075 939f      			PUSH_SREG			;guardo en la pila la posicion de memoria
                  			
-00013f 9100 0078 			lds r16, ADCL	
-000141 9120 0079 			lds r18, ADCH	
-000143 9300 0101 			sts VAL_PWMAL, r16
-000145 9320 0100 			sts VAL_PWMAH, r18		;guardo en variale PWMA el valor de ADC0		
-000147 9513      			inc CANAL1				
-000148 9310 007c 			sts ADMUX, CANAL1		;guardo CANAL1 en 1 para leer el ADC1 en la proxima conversion
-00014a c00d      			rjmp SALIDA
+000076 9150 0100 			lds r21, VAL_TensionADCH
+000078 9350 0089 			sts OCR1AH, r21		; salida PWMA timer OC1A
+00007a 9150 0101 			lds r21, VAL_TensionADCL	
+00007c 9350 0088 			sts OCR1AL, r21
+                 			
+00007e 9140 0102 			lds r20, VAL_CorrienteADCH
+000080 9340 008b 			sts OCR1BH, r20     ;salida PWMB timer OC1B
+000082 9140 0103 			lds r20, VAL_CorrienteADCL	
+000084 9340 008a 			sts OCR1BL, r20
+                 			
+000086 919f
+000087 918f
+000088 917f
+000089 916f
+00008a 915f
+00008b 914f
+00008c 913f
+00008d 912f
+00008e 911f
+00008f 910f
+000090 90ff
+000091 90ef
+000092 90df
+000093 bedf
+000094 90df      			POP_SREG			;recupero el valor de la pila
+000095 9518      			reti
                  
-                 		TRUE2:
-00014b 9100 0078 			lds r16, ADCL
-00014d 9120 0079 			lds r18, ADCH
-00014f 9300 0103 			sts VAL_PWMBL, r16		;guardo en variable PWMB el valor de ADC1
-000151 9320 0102 			sts VAL_PWMBH, r18
-000153 e030      			ldi r19, 0b0000_0000
-000154 9f03      			mul CANAL0, r19			;suma para cambiar al canal ADC0
-000155 9300 007c 			sts ADMUX, CANAL0		;guardo CANAL0 en 0 para leer ADC0 en la proxima conversion
-000157 c000      			rjmp SALIDA
+                 ;########################################################## INTERRUPCION POR PCINT0 #########################################################
                  
-                 		SALIDA:
-000158 914f
-000159 bf4f
-00015a 914f      			POP_SREG			;recupero valor de la pila
-00015b 9518      			reti
-                 
-                 		RTI_TIMER1_OVF:			; tratamiento de interrupcion del timer1
-00015c 934f
-00015d b74f
-00015e 934f      			PUSH_SREG			;guardo en la pila la posicion de memoria
-00015f 9100 0100 			lds r16, VAL_PWMAH	;
-000161 9500      			com r16
-000162 9300 0089 			sts OCR1AH, r16		; salida PWMA timer OC1A
-000164 9100 0101 			lds r16, VAL_PWMAL	
-000166 9500      			com r16
-000167 9300 0088 			sts OCR1AL, r16	
-                 
-000169 9100 0102 			lds r16, VAL_PWMBH	
-00016b 9500      			com r16
-00016c 9300 008b 			sts OCR1BH, r16     ;salida PWMB timer OC1B
-00016e 9100 0103 			lds r16, VAL_PWMBL
-000170 9500      			com r16
-000171 9300 008a 			sts OCR1BL, r16 
-                 
-000173 914f
-000174 bf4f
-000175 914f      			POP_SREG			;recupero el valor de la pila
-000176 9518      			reti
-                 		
                  		RTI_PCINT0:
-000177 991d      			sbic PINB,PINB5		; preg si PINB5=0
-000178 9a4e      			sbi PIND, PIND6		; enciendo led
+000096 92df
+000097 b6df
+000098 92df
+000099 92ef
+00009a 92ff
+00009b 930f
+00009c 931f
+00009d 932f
+00009e 933f
+00009f 934f
+0000a0 935f
+0000a1 936f
+0000a2 937f
+0000a3 938f
+0000a4 939f      			PUSH_SREG
+0000a5 991b      			sbic PINB,PINB3		; preg si PINB5=0
+0000a6 9a4e      			sbi PIND, PIND6		; enciendo led
+0000a7 919f
+0000a8 918f
+0000a9 917f
+0000aa 916f
+0000ab 915f
+0000ac 914f
+0000ad 913f
+0000ae 912f
+0000af 911f
+0000b0 910f
+0000b1 90ff
+0000b2 90ef
+0000b3 90df
+0000b4 bedf
+0000b5 90df      			POP_SREG
+0000b6 9518      			reti
+                 
+                 ;################################################################### SUBRUTINA PARA LEER ADC0 ###################################################################
+                 	
+                 	ADC0:
+                 
+                 			// *** Configuramos ADMUX ***
+0000b7 e400      		ldi r16, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(0<<MUX0) 
+0000b8 9300 007c 		sts ADMUX, r16  
+                 			; Referencia de Voltaje Con AVCC y Capacitor. Activamos ADC, Canal ADC0    
+                 
+                 		// *** Iniciamos conversión en ADC0 *** 
+0000ba ee0f      		ldi r16, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
+0000bb 9300 007a 		sts ADCSRA, r16 
+0000bd e006      		ldi r16, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
+0000be 9300 007b 		sts ADCSRB, r16
+                 
+                 		adcLeerADC0:
+0000c0 9100 007a 		lds r16, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
+0000c2 fd06      		SBRC r16, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
+0000c3 cffc      		rjmp adcLeerADC0 
+                 			
+0000c4 9110 0078 		lds r17, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
+0000c6 9100 0079 		lds r16, ADCH  ; Cargamos parte alta del ADC en el registro 16.
+0000c8 9310 0103 		sts VAL_CorrienteADCL, r17 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
+0000ca 9300 0102 		sts VAL_CorrienteADCH, r16
+                 	
+0000cc 9508      		ret
+                 			
+                 ;################################################################### SUBRUTINA PARA LEER ADC1 ###################################################################
+                 
+                 	ADC1:
+                 
+                 			// *** Configuramos ADMUX ***
+0000cd e421      		ldi r18, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(1<<MUX0) 
+0000ce 9320 007c 		sts ADMUX, r18  
+                 			; Referencia de Voltaje Con AVCC y Capacitor. Activamos ADC, Canal ADC0    
+                 
+                 		// *** Iniciamos conversión en ADC0 *** 
+0000d0 ee2f      		ldi r18, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
+0000d1 9320 007a 		sts ADCSRA, r18 
+0000d3 e026      		ldi r18, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
+0000d4 9320 007b 		sts ADCSRB, r18
+                 
+                 		adcLeerADC1:
+0000d6 9120 007a 		lds r18, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
+0000d8 fd26      		SBRC r18, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
+0000d9 cffc      		rjmp adcLeerADC1 
+                 			
+0000da 9120 0078 		lds r18, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
+0000dc 9130 0079 		lds r19, ADCH  ; Cargamos parte alta del ADC en el registro 16.
+0000de 9320 0101 		sts VAL_TensionADCL, r18 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
+0000e0 9330 0100 		sts VAL_TensionADCH, r19
+                 	
+0000e2 9508      		ret	
+                 ;################################################################### CALCULO DE TENSION ###################################################################
+                 	
+                 	CALCULO_TENSION:
+                 		
+0000e3 9170 0100 		lds R23, VAL_TensionADCH
+0000e5 9160 0101 		lds R22, VAL_TensionADCL		; Carga el numero VAL_Tension en r23:r22
+0000e7 e050      		ldi R21,0x00
+0000e8 e045      		ldi R20,0x05			; Carga el numero 5 r21:r20
+0000e9 940e 0104 		call mul16x16_16		; Llamado a rutina de multiplicacion de 16 bits x 16 bits
+                 		
+0000eb 9110 0104 		lds	DividendoH, RES_MULH
+0000ed 9100 0105 		lds	DividendoL, RES_MULL
+0000ef ef2f      		ldi	DivisorL,0xFF
+0000f0 e033      		ldi	DivisorH,0x03
+0000f1 940e 010f 		call	Division16_16
+                 
+0000f3 9170 0106 		lds R23, TensionH
+0000f5 9160 0107 		lds R22, TensionL			; Carga el numero VAL_Tension en r23:r22
+0000f7 e050      		ldi R21,0x00
+0000f8 e045      		ldi R20,0x05				; Carga 5 r21:r20
+0000f9 940e 0104 		call mul16x16_16			; Llamado a subrutina de multiplicacion de 16 bits x 16 bits
+                 		
+0000fb 9100 0104 		lds	r16, RES_MULH
+0000fd 9110 0105 		lds	r17, RES_MULL			
+0000ff 9300 0106 		sts TensionH, r16			; Guardamos en TensionH el resultado real medido
+000101 9310 0107 		sts TensionL, r17			; Guardamos en TensionL el resultado real medido
+000103 9508      		ret
+                 
+                 		; HAY QUE SALVAR EL RESTO LA PUTA MADRE
+                 
+                 ;################################################################### CALCULO DE CORRIENTE ###################################################################
+                  
+                 	CALCULO_CORRIENTE:
+                 
+                 
+                 
+                 
+                 
+                 ;################################################################### FUNCION DE MULTIPLICACION ###################################################################
+                 
+                 	mul16x16_16:
+                 
+000104 9f64      		mul	r22, r20				; al * bl
+000105 0180      		movw	r17:r16, r1:r0
+000106 9f74      		mul	r23, r20				; ah * bl
+000107 0d10      		add	r17, r0
+000108 9f56      		mul	r21, r22				; bh * al
+000109 0d10      		add	r17, r0
+00010a 9300 0105 		sts RES_MULL, r16
+00010c 9310 0104 		sts RES_MULH, r17 
+                 
+00010e 9508      		ret
+                 
+                 ;################################################################### FUNCION DE DIVISION ###################################################################
+                 
+                 	Division16_16:	
+00010f 24ee      		clr	RestoL					; borra byte low de Resto
+000110 18ff      		sub	RestoH,RestoH			; borra el byte alto y acarreo
+000111 e141      		ldi	Contador,17				; contador de bucle infinito
+                 		div_1:	
+000112 1f00      		rol	DividendoL				; desplazo a la izquierda el dividendo
+000113 1f11      		rol	DividendoH
+000114 954a      		dec	Contador				; decremento contador
+000115 f429      		brne	div_2				;if done
+000116 9300 0107 		sts	TensionL, DividendoL	; este valor se multiplica por 5
+000118 9310 0106 		sts TensionH, DividendoH	; este valor se muliplica  por 5
+00011a 9508      		ret							; salida
+                 		div_2:	
+00011b 1cee      		rol	RestoL					;desplazo a la izquerda el resto
+00011c 1cff      		rol	RestoH
+00011d 1ae2      		sub	RestoL,DivisorL			;resto = resto - divisor
+00011e 0af3      		sbc	RestoH,DivisorH	
+00011f f420      		brcc	div_3				;si el resultado es negativo
+000120 0ee2      		add	RestoL,DivisorL			; restaurar el resto
+000121 1ef3      		adc	RestoH,DivisorH
+000122 9488      		clc							;limpia el acarreo para ser deplazado al resultado
+000123 cfee      		rjmp	div_1				;else
+                 		div_3:	
+000124 9408      		sec							;pone a 1 la bandera de acarreo para ser trasladado al resultado
 
 
 RESOURCE USE INFORMATION
@@ -1182,40 +1363,40 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega328P" register use summary:
-r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
-r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:   0 r14:   0 r15:   0 
-r16:  50 r17:   6 r18:   6 r19:   4 r20:  12 r21:   0 r22:   0 r23:   0 
-r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 r29:   0 r30:   0 r31:   0 
+r0 :   3 r1 :   1 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
+r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:  12 r14:   8 r15:   9 
+r16:  50 r17:  15 r18:  17 r19:   9 r20:  14 r21:  11 r22:   8 r23:   7 
+r24:   4 r25:   4 r26:   0 r27:   0 r28:   0 r29:   0 r30:   0 r31:   0 
 x  :   0 y  :   0 z  :   0 
-Registers used: 5 out of 35 (14.3%)
+Registers used: 15 out of 35 (42.9%)
 
 "ATmega328P" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
-andi  :   2 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   2 brge  :   0 brhc  :   0 
+.lds  :   0 .sts  :   0 adc   :   1 add   :   3 adiw  :   0 and   :   0 
+andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
+brcc  :   1 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
-brne  :   3 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :   0 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :   0 cls   :   0 
-clt   :   0 clv   :   0 clz   :   0 com   :   4 cp    :   0 cpc   :   0 
-cpi   :   2 cpse  :   0 dec   :   3 eor   :   0 fmul  :   0 fmuls :   0 
-fmulsu:   0 icall :   0 ijmp  :   0 in    :   2 inc   :   1 jmp   :   4 
-ld    :   0 ldd   :   0 ldi   :  18 lds   :  10 lpm   :   0 lsl   :   0 
-lsr   :   0 mov   :   0 movw  :   0 mul   :   1 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   2 or    :   0 ori   :   0 out   :   8 pop   :   4 
-push  :   4 rcall :   0 ret   :   1 reti  :   4 rjmp  :   2 rol   :   0 
-ror   :   0 sbc   :   0 sbci  :   0 sbi   :   1 sbic  :   1 sbis  :   0 
-sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 
+brne  :   1 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  :   7 cbi   :   0 cbr   :   0 
+clc   :   1 clh   :   0 cli   :   0 cln   :   0 clr   :   1 cls   :   0 
+clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
+cpi   :   0 cpse  :   0 dec   :   1 eor   :   0 fmul  :   0 fmuls :   0 
+fmulsu:   0 icall :   0 ijmp  :   0 in    :   2 inc   :   0 jmp   :   4 
+ld    :   0 ldd   :   0 ldi   :  26 lds   :  18 lpm   :   0 lsl   :   0 
+lsr   :   0 mov   :   0 movw  :   1 mul   :   3 muls  :   0 mulsu :   0 
+neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   8 pop   :  28 
+push  :  28 rcall :   0 ret   :   5 reti  :   3 rjmp  :   4 rol   :   4 
+ror   :   0 sbc   :   1 sbci  :   0 sbi   :   1 sbic  :   1 sbis  :   0 
+sbiw  :   0 sbr   :   0 sbrc  :   2 sbrs  :   0 sec   :   1 seh   :   0 
 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
-sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :  18 
-sub   :   0 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 23 out of 113 (20.4%)
+sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :  30 
+sub   :   2 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
+Instructions used: 29 out of 113 (25.7%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0002f4    260      0    260   32768   0.8%
-[.dseg] 0x000100 0x000120      0      4      4    2048   0.2%
+[.cseg] 0x000000 0x00024c    496      0    496   32768   1.5%
+[.dseg] 0x000100 0x000120      0     12     12    2048   0.6%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 
 Assembly complete, 0 errors, 0 warnings
