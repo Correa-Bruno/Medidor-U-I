@@ -77,11 +77,14 @@
 .ORG 0x00
 	jmp INICIO
 
-.ORG 0x0006
-	jmp RTI_PCINT0
+.ORG 0x000A
+	jmp RTI_SELECT
 	
 .ORG 0x001A
 	jmp RTI_TIMER1_OVF
+
+.ORG 0x0024
+	jmp USART_RXC
 
 .ORG 0x34
 	reti
@@ -104,14 +107,14 @@
 
 ;########################################################## CONFIGURACION  de PINES y PCINT0 #########################################################
 
-		ldi r16, (0<<PB3)|(0<<PB4)|(0<<PB5)				;pines como entrada interrupcion de PCIE0
-		out DDRB,r16
-		ldi r16, (1<<PORTB3)|(1<<PORTB4)|(1<<PORTB5)	;Resistencias Pull Up
-		out PORTB, r16
-		ldi r16, (1<<PCIE0)								;habilito int por cambio de pines[7:0] (PCIE0)
+		ldi r16, (0<<PD7)|(0<<PD6)|(0<<PD5)				;pines como entrada interrupcion de PCIE2
+		out DDRD,r16
+		ldi r16, (1<<PORTD7)|(1<<PORTD6)|(1<<PORTD5)	;Resistencias Pull Up
+		out PORTD, r16
+		ldi r16, (1<<PCIE2)								;habilito int por cambio de pines[7:0] (PCIE2)
 		sts PCICR, r16
-		ldi r16, 0b0011_1000							;habilito los 3 pines de interrupcion (PB 3-4-5)
-		sts PCMSK0, r16
+		ldi r16, 0b1110_0000							;habilito los 3 pines de interrupcion (PCINT 23 - 22 - 21)
+		sts PCMSK2, r16
 
 		ldi r16, (1<<PB1)|(1<<PB2)						;como salida PB1(OC1A) y PB2(OC1B) PWM
 		out DDRB, r16
@@ -134,6 +137,19 @@
 		sts OCR1AL, r16
 		sts OCR1BH, r16
 		sts OCR1BL, r16
+
+;########################################################## CONFIGURACION DE USART #########################################################
+
+		ldi r16, 103								;Velocidad de transmicion 9600 Bd
+		ldi r17, 0
+		sts UBRR0H, r17
+		sts UBRR0L, r16
+
+		ldi r16, (1<<RXCIE0)|(1<<RXEN0)|(1<<TXEN0)	;Habilita interrupción por recepción, Habilita recepción, Habilita transmición
+		sts UCSR0B, r16
+			
+		ldi r16, (0<<USBS0)|(1<<UCSZ01)|(1<<UCSZ00)	;Stop Bit 1, 8 bits
+		sts UCSR0C, r16								
 		
 		SEI
 
@@ -170,10 +186,16 @@
 
 ;########################################################## INTERRUPCION POR PCINT0 #########################################################
 
-		RTI_PCINT0:
+		RTI_SELECT:
 			PUSH_SREG
-			sbic PINB,PINB3					; preg si PINB5=0
-			sbi PIND, PIND6					;enciendo led
+
+			sbic PIND, PIND7				;Pregunta si PD7 esta en 0
+			call MOSTRAR_POTENCIA			;Llama funcion para mostrar potencia
+			sbic PIND, PIND6				;Pregunta si PD6 esta en 0
+			call MOSTRAR_CORRIENTE			;Llama funcion para mostrar corriente
+			sbic PIND, PIND5				;Pregunta si PD5 esta en 0
+			call MOSTRAR_TENSION			;Llama funcion para mostrar tension
+			
 			POP_SREG
 			reti
 
@@ -334,3 +356,67 @@
 		rjmp	div_1
 		; resultado de la division r17, r16
 		; resto de la division r15, r14
+
+;########################################################## MOSTRAR POTENCIA #########################################################
+
+		MOSTRAR_POTENCIA:
+
+
+
+		ret
+
+;######################################################### MOSTRAR CORRIENTE #########################################################
+
+		MOSTRAR_CORRIENTE:
+
+
+
+		ret
+
+;########################################################## MOSTRAR TENSION #########################################################
+
+		MOSTRAR_TENSION:
+
+			call DESCOMPOSICION
+					
+			
+			call USART_ESPERA			
+			ldi r20, 0x56				; V
+			sts UDR0, r20
+
+			call USART_ESPERA
+			ldi r20, 0x20				; (espacio)
+			sts UDR0, r20
+
+			call USART_ESPERA			
+			ldi r20, 0x3D				; =
+			sts UDR0, r20
+
+
+		ret
+
+;########################################################## USART RECEPCION #########################################################
+
+		USART_RXC:
+
+
+
+		reti
+
+;########################################################## USART ESPERA #########################################################
+
+		USART_ESPERA:
+
+			lds r26, UCSR0A				;Espera que se limpie la bandera de transmicion
+			sbrs r26, UDRE0
+			rjmp USART_ESPERA
+			ret
+
+;########################################################## DESCOMPOSICION #########################################################
+		
+		DESCOMPOSICION:
+			
+			lds r16, Tension
+			lds r17, TensionresH
+			lds r18, TensionresL
+
