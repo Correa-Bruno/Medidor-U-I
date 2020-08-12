@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm Fri Aug 07 11:10:38 2020
+AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm Wed Aug 12 10:11:35 2020
 
 [builtin](2): Including file 'C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include\m328Pdef.inc'
                  
@@ -1006,17 +1006,19 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
 000101           	VAL_TensionADCL: .Byte 1
 000102           	VAL_CorrienteADCH: .Byte 1
 000103           	VAL_CorrienteADCL: .Byte 1
-000104           	RES_MULH: .Byte 1
-000105           	RES_MULL: .Byte 1
-000106           	TensionH: .Byte 1
-000107           	TensionL: .Byte 1
-000108           	PotenciaH: .Byte 1
-000109           	PotenciaL: .Byte 1
-00010a           	CorrienteH: .Byte 1
-00010b           	CorrienteL: .Byte 1
+000104           	Tension: .Byte 1
+000105           	TensionresH: .Byte 1
+000106           	TensionresL: .Byte 1
+000107           	PotenciaH: .Byte 1
+000108           	PotenciaL: .Byte 1
+000109           	Corriente: .Byte 1
+00010a           	CorrienteresH: .Byte 1
+00010b           	CorrienteresL: .Byte 1
+00010c           	RestodivL: .Byte 1
+00010d           	RestodivH: .Byte 1
                  	
                  .ORG 0x110
-                 	.MACRO	PUSH_SREG
+                 	.MACRO	PUSH_SREG				;Guardo en la pila la posicion de memoria
                  			push r13
                  			in r13, SREG
                  			push r13
@@ -1032,7 +1034,6 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
                  			push r23
                  			push r24
                  			push r25
-                 					;guardo en la pila la posicion de memoria
                  	.ENDMACRO
                  .ORG 0x120
                  	.MACRO	POP_SREG
@@ -1049,7 +1050,7 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
                  			pop r15
                  			pop r14
                  			pop r13
-                 			out sreg, r13		;recupero de la pila la posicion de memoria
+                 			out sreg, r13				;recupero de la pila la posicion de memoria
                  			pop r13
                  	.ENDMACRO
                  
@@ -1067,6 +1068,7 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
                  
                  .ORG 0x34
 000034 9518      	reti
+                 
                  ;################################################################################################################################## 
                  ;########################################################## CONFIGURACION #########################################################
                  ;##################################################################################################################################
@@ -1085,19 +1087,19 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
                  
                  ;########################################################## CONFIGURACION  de PINES y PCINT0 #########################################################
                  
-00003c e000      		ldi r16, (0<<PB3)|(0<<PB4)|(0<<PB5)				; pines como entrada interrupcion de PCIE0
+00003c e000      		ldi r16, (0<<PB3)|(0<<PB4)|(0<<PB5)				;pines como entrada interrupcion de PCIE0
 00003d b904      		out DDRB,r16
-00003e e308      		ldi r16, (1<<PORTB3)|(1<<PORTB4)|(1<<PORTB5)	; Resistencias Pull Up
+00003e e308      		ldi r16, (1<<PORTB3)|(1<<PORTB4)|(1<<PORTB5)	;Resistencias Pull Up
 00003f b905      		out PORTB, r16
-000040 e001      		ldi r16, (1<<PCIE0)			;habilito int por cambio de pines[7:0] (PCIE0)
+000040 e001      		ldi r16, (1<<PCIE0)								;habilito int por cambio de pines[7:0] (PCIE0)
 000041 9300 0068 		sts PCICR, r16
-000043 e308      		ldi r16, 0b0011_1000		;habilito los 3 pines de interrupcion (PB 3-4-5)
+000043 e308      		ldi r16, 0b0011_1000							;habilito los 3 pines de interrupcion (PB 3-4-5)
 000044 9300 006b 		sts PCMSK0, r16
                  
-000046 e006      		ldi r16, (1<<PB1)|(1<<PB2)  ;como salida PB1(OC1A) y PB2(OC1B) PWM
+000046 e006      		ldi r16, (1<<PB1)|(1<<PB2)						;como salida PB1(OC1A) y PB2(OC1B) PWM
 000047 b904      		out DDRB, r16
                  
-000048 e600      		ldi r16, (1<<PD5)|(1<<PD6)	; enciendo led prueba interrupcion externa PCEI0
+000048 e600      		ldi r16, (1<<PD5)|(1<<PD6)						;enciendo led prueba interrupcion externa PCEI0
 000049 b90a      		out DDRD, r16
                  
                  ;########################################################## CONFIGURACION DE TIMER/COMP 1 #########################################################
@@ -1107,7 +1109,7 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
 00004d e00a      		ldi r16, (1<<WGM12)|(0<<WGM13)|(0<<CS12)|(1<<CS11)|(0<<CS10)  ;selector de reloj de timer/counter: Clock_I-O/8(from prescaler)
 00004e 9300 0081 		sts TCCR1B, r16
                  
-000050 e001      		ldi r16, (1<<TOIE1)		;interrupcion de salida del temporizador/contador  
+000050 e001      		ldi r16, (1<<TOIE1)								;interrupcion de salida del temporizador/contador  
 000051 9300 006f 		sts TIMSK1, r16
                  		
 000053 e000      		ldi r16, 0x00
@@ -1128,7 +1130,7 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
 00005d 940e 00b7 			call ADC0
 00005f 940e 00cd 			call ADC1
 000061 940e 00e3 			call CALCULO_TENSION
-000063 940e 0104 			call CALCULO_CORRIENTE
+000063 940e 00f6 			call CALCULO_CORRIENTE
 000065 940c 005d 			jmp BUCLE
                  
                  ;########################################################## TRATAMIENTO DE INTERRUPCION DEL TIMER1 (salidas PWM 1-5 V) #########################################################
@@ -1148,15 +1150,15 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
 000072 936f
 000073 937f
 000074 938f
-000075 939f      			PUSH_SREG			;guardo en la pila la posicion de memoria
+000075 939f      			PUSH_SREG						;guardo en la pila la posicion de memoria
                  			
 000076 9150 0100 			lds r21, VAL_TensionADCH
-000078 9350 0089 			sts OCR1AH, r21		; salida PWMA timer OC1A
+000078 9350 0089 			sts OCR1AH, r21					;salida PWMA timer OC1A
 00007a 9150 0101 			lds r21, VAL_TensionADCL	
 00007c 9350 0088 			sts OCR1AL, r21
                  			
 00007e 9140 0102 			lds r20, VAL_CorrienteADCH
-000080 9340 008b 			sts OCR1BH, r20     ;salida PWMB timer OC1B
+000080 9340 008b 			sts OCR1BH, r20					;salida PWMB timer OC1B
 000082 9140 0103 			lds r20, VAL_CorrienteADCL	
 000084 9340 008a 			sts OCR1BL, r20
                  			
@@ -1174,7 +1176,7 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
 000091 90ef
 000092 90df
 000093 bedf
-000094 90df      			POP_SREG			;recupero el valor de la pila
+000094 90df      			POP_SREG						;recupero el valor de la pila
 000095 9518      			reti
                  
                  ;########################################################## INTERRUPCION POR PCINT0 #########################################################
@@ -1195,8 +1197,8 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
 0000a2 937f
 0000a3 938f
 0000a4 939f      			PUSH_SREG
-0000a5 991b      			sbic PINB,PINB3		; preg si PINB5=0
-0000a6 9a4e      			sbi PIND, PIND6		; enciendo led
+0000a5 991b      			sbic PINB,PINB3					; preg si PINB5=0
+0000a6 9a4e      			sbi PIND, PIND6					;enciendo led
 0000a7 919f
 0000a8 918f
 0000a9 917f
@@ -1214,7 +1216,7 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
 0000b5 90df      			POP_SREG
 0000b6 9518      			reti
                  
-                 ;################################################################### SUBRUTINA PARA LEER ADC0 ###################################################################
+                 ;########################################################## SUBRUTINA PARA LEER ADC0 ###################################################################
                  	
                  	ADC0:
                  
@@ -1272,80 +1274,104 @@ AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medi
                  	CALCULO_TENSION:
                  		
 0000e3 9170 0100 		lds R23, VAL_TensionADCH
-0000e5 9160 0101 		lds R22, VAL_TensionADCL		; Carga el numero VAL_Tension en r23:r22
+0000e5 9160 0101 		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
 0000e7 e050      		ldi R21,0x00
-0000e8 e045      		ldi R20,0x05			; Carga el numero 5 r21:r20
-0000e9 940e 0104 		call mul16x16_16		; Llamado a rutina de multiplicacion de 16 bits x 16 bits
-                 		
-0000eb 9110 0104 		lds	DividendoH, RES_MULH
-0000ed 9100 0105 		lds	DividendoL, RES_MULL
-0000ef ef2f      		ldi	DivisorL,0xFF
-0000f0 e033      		ldi	DivisorH,0x03
-0000f1 940e 010f 		call	Division16_16
+0000e8 e149      		ldi R20,0x19						;Carga el numero 25 r21:r20
+0000e9 940e 010d 		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
+                 	
+0000eb ef2f      		ldi	DivisorL,0xFF					;el dividendo ya esta en r16 y r17
+0000ec e033      		ldi	DivisorH,0x03					;Dividimos por 1023, para llevar resultado de 0 a 25
+0000ed 940e 011f 		call Division16_16
+0000ef 9300 0104 		sts	Tension, DividendoL				;Valor de la tension real
                  
-0000f3 9170 0106 		lds R23, TensionH
-0000f5 9160 0107 		lds R22, TensionL			; Carga el numero VAL_Tension en r23:r22
-0000f7 e050      		ldi R21,0x00
-0000f8 e045      		ldi R20,0x05				; Carga 5 r21:r20
-0000f9 940e 0104 		call mul16x16_16			; Llamado a subrutina de multiplicacion de 16 bits x 16 bits
+0000f1 92f0 0105 		sts TensionresH, r15				;parte decimal del resto de la divison
+0000f3 92e0 0106 		sts TensionresL, r14
                  		
-0000fb 9100 0104 		lds	r16, RES_MULH
-0000fd 9110 0105 		lds	r17, RES_MULL			
-0000ff 9300 0106 		sts TensionH, r16			; Guardamos en TensionH el resultado real medido
-000101 9310 0107 		sts TensionL, r17			; Guardamos en TensionL el resultado real medido
-000103 9508      		ret
-                 
-                 		; HAY QUE SALVAR EL RESTO LA PUTA MADRE
+0000f5 9508      		ret
                  
                  ;################################################################### CALCULO DE CORRIENTE ###################################################################
                   
                  	CALCULO_CORRIENTE:
                  
+0000f6 9170 0102 		 lds r23, VAL_CorrienteADCH			;Carga valores del ADC
+0000f8 9160 0103 		 lds r22, VAL_CorrienteADCL
+0000fa e081      		 ldi r24, 0x01						;Carga complemento de 511 para restar
+0000fb ef9e      		 ldi r25, 0xFE
+0000fc 0f68      		 add r22, r24						;Realiza suma (resta)
+0000fd 1f79      		 adc r23, r25
+0000fe e070      		 ldi r23, 0x00						;Ponemos 0 en la parte alta del resultado
+0000ff e052      		 ldi r21, 0x02						;Carga 587 (factor para adecuar la medicion) para multiplicar
+000100 e44b      		 ldi r20, 0x4B
+000101 940e 010d 		 call mul16x16_16					;Llama funcion multiplicacion
                  
+000103 e237      		 ldi DivisorH, 0x27					;Carga 10000 en el divisor (para obtener nuestro factor >> 0.0587)
+000104 e120      		 ldi DivisorL, 0x10
+000105 940e 011f 		 call Division16_16					;Llama funcion division
                  
+000107 9300 0109 		 sts Corriente, r16					;Resultado corriente
+000109 92f0 010a 		 sts CorrienteresH, r15				;Parte decimal de la division
+00010b 92e0 010b 		 sts CorrienteresL, r14
                  
                  
                  ;################################################################### FUNCION DE MULTIPLICACION ###################################################################
                  
                  	mul16x16_16:
                  
-000104 9f64      		mul	r22, r20				; al * bl
-000105 0180      		movw	r17:r16, r1:r0
-000106 9f74      		mul	r23, r20				; ah * bl
-000107 0d10      		add	r17, r0
-000108 9f56      		mul	r21, r22				; bh * al
-000109 0d10      		add	r17, r0
-00010a 9300 0105 		sts RES_MULL, r16
-00010c 9310 0104 		sts RES_MULH, r17 
+00010d 9f64      		mul	r22, r20				; al * bl
+00010e 0180      		movw	r17:r16, r1:r0
+00010f 9f74      		mul	r23, r20				; ah * bl
+000110 0d10      		add	r17, r0
+000111 9f56      		mul	r21, r22				; bh * al
+000112 0d10      		add	r17, r0
+                 		;resultado r17, r16
+000113 9508      		ret
                  
-00010e 9508      		ret
+                 ;############################################################ FUNCION DE MULTIPLICACION DEL RESTO ###################################################################
+                 
+                 	mul16x16_24:
+000114 9f75      		mul		r23, r21		; ah * bh
+000115 2d20      		mov		r18, r0
+000116 9f64      		mul		r22, r20		; al * bl
+000117 0180      		movw	r17:r16, r1:r0
+000118 9f74      		mul		r23, r20		; ah * bl
+000119 0d10      		add		r17, r0
+00011a 1d21      		adc		r18, r1
+00011b 9f56      		mul		r21, r22		; bh * al
+00011c 0d10      		add		r17, r0
+00011d 1d21      		adc		r18, r1
+                 		; resultado r18, r17, r16
+00011e 9508      		ret
+                 
                  
                  ;################################################################### FUNCION DE DIVISION ###################################################################
                  
                  	Division16_16:	
-00010f 24ee      		clr	RestoL					; borra byte low de Resto
-000110 18ff      		sub	RestoH,RestoH			; borra el byte alto y acarreo
-000111 e141      		ldi	Contador,17				; contador de bucle infinito
+00011f 24ee      		clr	RestoL					; borra byte low de Resto
+000120 18ff      		sub	RestoH,RestoH			; borra el byte alto y acarreo
+000121 e141      		ldi	Contador,17				; contador de bucle infinito
                  		div_1:	
-000112 1f00      		rol	DividendoL				; desplazo a la izquierda el dividendo
-000113 1f11      		rol	DividendoH
-000114 954a      		dec	Contador				; decremento contador
-000115 f429      		brne	div_2				;if done
-000116 9300 0107 		sts	TensionL, DividendoL	; este valor se multiplica por 5
-000118 9310 0106 		sts TensionH, DividendoH	; este valor se muliplica  por 5
-00011a 9508      		ret							; salida
+000122 1f00      		rol	DividendoL				; desplazo a la izquierda el dividendo
+000123 1f11      		rol	DividendoH
+000124 954a      		dec	Contador				; decremento contador
+000125 f429      		brne	div_2				;if done
+                 		;sts	Tension, DividendoL	; este valor se multiplica por 5
+000126 92e0 010c 		sts RestodivL, RestoL
+000128 92f0 010d 		sts RestodivH, RestoH
+00012a 9508      		ret							; salida
                  		div_2:	
-00011b 1cee      		rol	RestoL					;desplazo a la izquerda el resto
-00011c 1cff      		rol	RestoH
-00011d 1ae2      		sub	RestoL,DivisorL			;resto = resto - divisor
-00011e 0af3      		sbc	RestoH,DivisorH	
-00011f f420      		brcc	div_3				;si el resultado es negativo
-000120 0ee2      		add	RestoL,DivisorL			; restaurar el resto
-000121 1ef3      		adc	RestoH,DivisorH
-000122 9488      		clc							;limpia el acarreo para ser deplazado al resultado
-000123 cfee      		rjmp	div_1				;else
+00012b 1cee      		rol	RestoL					;desplazo a la izquerda el resto
+00012c 1cff      		rol	RestoH
+00012d 1ae2      		sub	RestoL,DivisorL			;resto = resto - divisor
+00012e 0af3      		sbc	RestoH,DivisorH	
+00012f f420      		brcc	div_3				;si el resultado es negativo
+000130 0ee2      		add	RestoL,DivisorL			; restaurar el resto
+000131 1ef3      		adc	RestoH,DivisorH
+000132 9488      		clc							;limpia el acarreo para ser deplazado al resultado
+000133 cfee      		rjmp	div_1				;else
                  		div_3:	
-000124 9408      		sec							;pone a 1 la bandera de acarreo para ser trasladado al resultado
+000134 9408      		sec							;pone a 1 la bandera de acarreo para ser trasladado al resultado
+000135 cfec      		rjmp	div_1
+                 		; resultado de la division r17, r16
 
 
 RESOURCE USE INFORMATION
@@ -1363,40 +1389,40 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega328P" register use summary:
-r0 :   3 r1 :   1 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
-r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:  12 r14:   8 r15:   9 
-r16:  50 r17:  15 r18:  17 r19:   9 r20:  14 r21:  11 r22:   8 r23:   7 
-r24:   4 r25:   4 r26:   0 r27:   0 r28:   0 r29:   0 r30:   0 r31:   0 
+r0 :   7 r1 :   4 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
+r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:  12 r14:  11 r15:  12 
+r16:  48 r17:  13 r18:  21 r19:  10 r20:  16 r21:  13 r22:  11 r23:  11 
+r24:   6 r25:   6 r26:   0 r27:   0 r28:   0 r29:   0 r30:   0 r31:   0 
 x  :   0 y  :   0 z  :   0 
 Registers used: 15 out of 35 (42.9%)
 
 "ATmega328P" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   1 add   :   3 adiw  :   0 and   :   0 
+.lds  :   0 .sts  :   0 adc   :   4 add   :   6 adiw  :   0 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
 brcc  :   1 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
 brne  :   1 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :   7 cbi   :   0 cbr   :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  :   8 cbi   :   0 cbr   :   0 
 clc   :   1 clh   :   0 cli   :   0 cln   :   0 clr   :   1 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
 cpi   :   0 cpse  :   0 dec   :   1 eor   :   0 fmul  :   0 fmuls :   0 
 fmulsu:   0 icall :   0 ijmp  :   0 in    :   2 inc   :   0 jmp   :   4 
-ld    :   0 ldd   :   0 ldi   :  26 lds   :  18 lpm   :   0 lsl   :   0 
-lsr   :   0 mov   :   0 movw  :   1 mul   :   3 muls  :   0 mulsu :   0 
+ld    :   0 ldd   :   0 ldi   :  31 lds   :  14 lpm   :   0 lsl   :   0 
+lsr   :   0 mov   :   1 movw  :   2 mul   :   7 muls  :   0 mulsu :   0 
 neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   8 pop   :  28 
-push  :  28 rcall :   0 ret   :   5 reti  :   3 rjmp  :   4 rol   :   4 
+push  :  28 rcall :   0 ret   :   6 reti  :   3 rjmp  :   4 rol   :   4 
 ror   :   0 sbc   :   1 sbci  :   0 sbi   :   1 sbic  :   1 sbis  :   0 
 sbiw  :   0 sbr   :   0 sbrc  :   2 sbrs  :   0 sec   :   1 seh   :   0 
 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
-sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :  30 
+sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :  32 
 sub   :   2 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 29 out of 113 (25.7%)
+Instructions used: 30 out of 113 (26.5%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x00024c    496      0    496   32768   1.5%
-[.dseg] 0x000100 0x000120      0     12     12    2048   0.6%
+[.cseg] 0x000000 0x00026c    528      0    528   32768   1.6%
+[.dseg] 0x000100 0x000120      0     14     14    2048   0.7%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 
 Assembly complete, 0 errors, 0 warnings
