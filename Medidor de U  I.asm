@@ -9,20 +9,60 @@
  ;############################################################### DECLARACION ##############################################################
  ;##########################################################################################################################################
 
-.def	ENTEROL=r12
-.def	ENTEROH=r13
-.def	RestoL=r14
-.def	RestoH=r15
-.def	DividendoL=r16
-.def	DividendoH=r17
-.def	DivisorL=r18
-.def	DivisorH=r19
-.def	Contador=r20
-.def	rBin2L=r21
-.def	rBin2H=r22
-.def	rmp=r23
-.def	DECIMALL=r24
-.def	DECIMALH=r25
+.def	ENTEROL=r12				;Subrutina mostrar
+.def	ENTEROH=r13				;Subrutina mostrar
+.def	RestoL=r14				;Subrutina division
+.def	RestoH=r15				;Subrutina division
+.def	DividendoL=r16			;Subrutina division
+.def	DividendoH=r17			;Subrutina division
+.def	DivisorL=r18			;Subrutina division
+.def	DivisorH=r19			;Subrutina division
+.def	Contador=r20			;Subrutina division
+.def	rBin2L=r21				;Subrutina descomposicion
+.def	rBin2H=r22				;Subrutina descomposicion
+.def	rmp=r23					;Subrutina descomposicion
+
+.MACRO	PUSH_SREG				;Guardo en la pila la posicion de memoria
+		push r13
+		in r13, SREG			;guardar registro de tranjo 12 tmb 
+		push r13
+		push r12
+		push r14
+		push r15
+		push r16
+		push r17
+		push r18
+		push r19
+		push r20
+		push r21
+		push r22
+		push r23
+		push r24
+		push r25
+		push r26
+		push r27
+.ENDMACRO
+
+.MACRO	POP_SREG
+		pop r27
+		pop r26
+		pop r25
+		pop r24
+		pop r23
+		pop r22
+		pop r21
+		pop r20
+		pop r19
+		pop r18
+		pop r17
+		pop r16
+		pop r15
+		pop r14
+		pop r12
+		pop r13
+		out sreg, r13				;recupero de la pila la posicion de memoria
+		pop r13
+.ENDMACRO
 
 .DSEG
 .ORG 0x100
@@ -30,60 +70,18 @@
 	VAL_TensionADCL: .Byte 1
 	VAL_CorrienteADCH: .Byte 1
 	VAL_CorrienteADCL: .Byte 1
-	Tension: .Byte 1
-	TensionresH: .Byte 1
-	TensionresL: .Byte 1
+	TensionH: .Byte 1
+	TensionL: .Byte 1
 	PotenciaH: .Byte 1
 	PotenciaL: .Byte 1
-	Corriente: .Byte 1
-	CorrienteresH: .Byte 1
-	CorrienteresL: .Byte 1
+	CorrienteH: .Byte 1
+	CorrienteL: .Byte 1
 	RestodivL: .Byte 1
 	RestodivH: .Byte 1
-	VECTOR_DECIMAL: .Byte 3
-	VECTOR_ENTERO: .Byte 2
+	VECTOR: .Byte 5
 	DATO_RX: .Byte 1
-
-.ORG 0x110
-	.MACRO	PUSH_SREG				;Guardo en la pila la posicion de memoria
-			push r13
-			in r13, SREG
-			push r13
-			push r14
-			push r15
-			push r16
-			push r17
-			push r18
-			push r19
-			push r20
-			push r21
-			push r22
-			push r23
-			push r24
-			push r25
-			push r26
-			push r27
-	.ENDMACRO
-.ORG 0x120
-	.MACRO	POP_SREG
-			pop r27
-			pop r26
-			pop r25
-			pop r24
-			pop r23
-			pop r22
-			pop r21
-			pop r20
-			pop r19
-			pop r18
-			pop r17
-			pop r16
-			pop r15
-			pop r14
-			pop r13
-			out sreg, r13				;recupero de la pila la posicion de memoria
-			pop r13
-	.ENDMACRO
+	GRANDEH: .Byte 1
+	GRANDEL: .Byte 1
 
 ;########################################################## VECTORES DE INTERRUPCION #########################################################
 
@@ -185,7 +183,7 @@
 
 		RTI_TIMER1_OVF:			
 			PUSH_SREG						;guardo en la pila la posicion de memoria
-			
+								
 			lds r21, VAL_TensionADCH
 			sts OCR1AH, r21					;salida PWMA timer OC1A
 			lds r21, VAL_TensionADCL	
@@ -196,7 +194,7 @@
 			lds r20, VAL_CorrienteADCL	
 			sts OCR1BL, r20
 			
-			POP_SREG						;recupero el valor de la pila
+			POP_SREG					;recupero el valor de la pila
 			reti
 
 ;########################################################## INTERRUPCION POR PCINT0 #########################################################
@@ -274,17 +272,28 @@
 		lds R23, VAL_TensionADCH
 		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
 		ldi R21,0x00
-		ldi R20,0x19						;Carga el numero 25 r21:r20
+		ldi R20,0x18						;Carga el numero 24 r21:r20
+		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
+		sts GRANDEH, r17					;Guardamos resultado de la primer multiplicacion
+		sts GRANDEL, r16
+
+		lds R23, VAL_TensionADCH
+		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
+		ldi R21,0x00
+		ldi R20,0x2B						;Carga el numero 43 r21:r20
 		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 	
-		ldi	DivisorL,0xFF					;el dividendo ya esta en r16 y r17
-		ldi	DivisorH,0x03					;Dividimos por 1023, para llevar resultado de 0 a 25
+		ldi	DivisorL,0x64					;El dividendo ya esta en r16 y r17
+		ldi	DivisorH,0x00					;Dividimos por 100
 		call Division16_16
-		sts	Tension, DividendoL				;Valor de la tension real
 
-		sts TensionresH, r15				;parte decimal del resto de la divison
-		sts TensionresL, r14
-		
+		lds r19, GRANDEH
+		lds r18, GRANDEL
+
+		add r19, DividendoH					;Sumamos primer calculo con segundo calculo
+		adc r18, DividendoL
+		sts	TensionH, r19					;Valor de la tension real
+		sts	TensionL, r18
 		ret
 
 ;################################################################### CALCULO DE CORRIENTE ###################################################################
@@ -302,13 +311,24 @@
 		ldi r20, 0x4B
 		call mul16x16_16					;Llama funcion multiplicacion
 
-		ldi DivisorH, 0x27					;Carga 10000 en el divisor (para obtener nuestro factor >> 0.0587)
-		ldi DivisorL, 0x10
+		ldi DivisorH, 0x00					;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
+		ldi DivisorL, 0x0A
 		call Division16_16					;Llama funcion division
 
-		sts Corriente, r16					;Resultado corriente
-		sts CorrienteresH, r15				;Parte decimal de la division
-		sts CorrienteresL, r14
+		sts CorrienteH, r17					;Resultado corriente
+		sts CorrienteL, r16				
+		ret
+
+;################################################################### CALCULO DE POTENCIA ###################################################################
+ 
+	CALCULO_POTENCIA:
+
+		lds r23, TensionH
+		lds r22, TensionL
+		lds r21, CorrienteH
+		lds r20, CorrienteL
+		call mul16x16_16					;Llama funcion multiplicacion
+
 		ret
 		
 ;################################################################### FUNCION DE MULTIPLICACION ###################################################################
@@ -352,7 +372,6 @@
 		rol	DividendoH
 		dec	Contador				; decremento contador
 		brne	div_2				;if done
-		;sts	Tension, DividendoL	; este valor se multiplica por 5
 		sts RestodivL, RestoL
 		sts RestodivH, RestoH
 		ret							; salida
@@ -376,29 +395,82 @@
 
 	MOSTRAR_POTENCIA:
 
-
+		
 
 		ret
 
 ;######################################################### MOSTRAR CORRIENTE #########################################################
 
 	MOSTRAR_CORRIENTE:
+		
+		lds ENTEROH, CorrienteH		;Cargar valor de corriente alta
+		lds ENTEROL, CorrienteL		;Cargar valor de corriente baja
+		
+		call DESCOMPOSICION
+				
+		call USART_ESPERA			
+		ldi r20, 0x49				; I
+		sts UDR0, r20
 
+		call USART_ESPERA
+		ldi r20, 0x20				; (espacio)
+		sts UDR0, r20
 
+		call USART_ESPERA			
+		ldi r20, 0x3D				; =
+		sts UDR0, r20
 
+		call USART_ESPERA
+		ldi r20, 0x20				; (espacio)
+		sts UDR0, r20
+
+		call MOSTRAR
+
+		call USART_ESPERA
+		ldi r20, 0x20				; (espacio)
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x41				; A
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x6D				; m
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x70				; p
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x65				; e
+		sts UDR0, r20
+		
+		call USART_ESPERA			
+		ldi r20, 0x72				; r
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x0A				; (salto de linea)
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x0D				; (retorno de carro)
+		sts UDR0, r20
+
+		clr r17						;Limpiar registro de dato recibido
+		sts DATO_RX, r17
+	
 		ret
 
 ;########################################################## MOSTRAR TENSION #########################################################
 
 	MOSTRAR_TENSION:
 
-		clr ENTEROH					;Poner regitro en 0x00
-		lds ENTEROL, Tension		;Cargar valor de tension
-		lds DECIMALH, TensionresH	;Cargar valor decimal de tension
-		lds DECIMALL, TensionresL
+		lds ENTEROH, TensionH		;Cargar valor de tension alta
+		lds ENTEROL, TensionL		;Cargar valor de tension baja
 		
-		call DESCOMPOSICION_ENTERO	
-		call DESCOMPOSICION_DECIMAL
+		call DESCOMPOSICION
 				
 		call USART_ESPERA			
 		ldi r20, 0x56				; V
@@ -416,13 +488,7 @@
 		ldi r20, 0x20				; (espacio)
 		sts UDR0, r20
 
-		call MOSTRAR_ENTERO
-
-		call USART_ESPERA			
-		ldi r20, 0x2C				; ,
-		sts UDR0, r20
-
-		call MOSTRAR_DECIMAL
+		call MOSTRAR
 
 		call USART_ESPERA
 		ldi r20, 0x20				; (espacio)
@@ -477,45 +543,11 @@
 
 ;########################################################## DESCOMPOSICION ENTERO #########################################################
 		
-	DESCOMPOSICION_ENTERO:
+	DESCOMPOSICION:
 
-		lds	YL, LOW(VECTOR_ENTERO)
-		ldi rmp, 0x00				;Cargamos 10
-		mov rBin2H,rmp
-		ldi rmp, 0x0A
-		mov rBin2L,rmp
-		rcall Bin2ToDigitE			;Funcion para calcular digito
-		st y,ENTEROL
-		sbiw YL,1					;Poner el puntero en el primer BCD
-		ret
-
-	Bin2ToDigitE:
-		clr rmp						;Conteo en cero
-
-	Bin2ToDigitaE:
-		cp ENTEROH,rBin2H			;Comparo nro con comparacion parte alta
-		brcs Bin2ToDigitcE			;Si Carry=1 el nro es menor a comparacion, vuelve a rutina para comparar con un valor menor
-		brne Bin2ToDigitbE	
-		cp ENTEROL,rBin2L			;Si es igual, Comparo nro con comparacion parte baja
-		brcs Bin2ToDigitcE			;Si Carry=1 el nro es menor a comparacion
-
-	Bin2ToDigitbE:			
-		sub ENTEROL,rBin2L			;Resto partes bajas
-		sbc ENTEROH,rBin2H			;Resto partes altas con carry
-		inc rmp						;Incremento cuenta para digito BCD
-		rjmp Bin2ToDigitaE			;Repito el proceso hasta que sea menor a comparacion
-
-	Bin2ToDigitcE:
-		st y+,rmp					;Salva el digito 
-		ret
-
-;########################################################## DESCOMPOSICION DECIMAL #########################################################
-		
-	DESCOMPOSICION_DECIMAL:
-
-		lds	ZL, LOW(VECTOR_DECIMAL)
-		lds	ZH, HIGH(VECTOR_DECIMAL)		
-		ldi rmp, 0X27				;Cargamos 10000
+		ldi	ZL, LOW(VECTOR)
+		ldi	ZH, HIGH(VECTOR)			
+		ldi rmp, 0x27				;Cargamos 10000
 		mov rBin2H,rmp
 		ldi rmp, 0x10
 		mov rBin2L,rmp
@@ -530,78 +562,81 @@
 		ldi rmp, 0x64
 		mov rBin2L,rmp
 		rcall Bin2ToDigit			;Funcion para calcular digito
-		sbiw ZL,2					;Poner el puntero en el primer BCD
+		ldi rmp, 0x00				;Cargamos 10
+		mov rBin2H,rmp
+		ldi rmp, 0x0A
+		mov rBin2L,rmp
+		rcall Bin2ToDigit			;Funcion para calcular digito
+		st z,ENTEROL
+		sbiw ZL,4					;Poner el puntero en el primer BCD
 		ret
 
 	Bin2ToDigit:
 		clr rmp						;Conteo en cero
 
 	Bin2ToDigita:
-		cp DECIMALH,rBin2H			;Comparo nro con comparacion parte alta
-		brcs Bin2ToDigitc			;Si Carry=1 el nro es menor a comparacion, vuelve a rutina para comparar con un valor menor
-		brne Bin2ToDigitb	
-		cp DECIMALL,rBin2L			;Si es igual, Comparo nro con comparacion parte baja
-		brcs Bin2ToDigitc			;Si Carry=1 el nro es menor a comparacion
+		cp ENTEROH,rBin2H			; Comparo nro con comparacion parte alta
+		brcs Bin2ToDigitc			; Si Carry=1 el nro es menor a comparacion, vuelve a rutina para comparar con un valor menor
+		brne Bin2ToDigitb	 
+		cp ENTEROL,rBin2L			; Si es igual, Comparo nro con comparacion parte baja
+		brcs Bin2ToDigitc			; Si Carry=1 nro menor a comparacion
 
 	Bin2ToDigitb:			
-		sub DECIMALL,rBin2L			;Resto partes bajas
-		sbc DECIMALH,rBin2H			;Resto partes altas con carry
-		inc rmp						;Incremento cuenta para digito BCD
-		rjmp Bin2ToDigita			;Repito el proceso hasta que sea menor a comparacion
+		sub ENTEROL,rBin2L			; Resto partes bajas
+		sbc ENTEROH,rBin2H			; Resto partes altas con carry
+		inc rmp						; Incremento cuenta para digito BCD
+		rjmp Bin2ToDigita			; Repito el proceso hasta que sea menor a comparacion
 
 	Bin2ToDigitc:
-		st z+,rmp					;Salva el digito 
+		st z+,rmp					; Salva el digito 
 		ret
 
 ;########################################################## MOSTRAR ENTERO #########################################################
 	
-	MOSTRAR_ENTERO:
-
-		call USART_ESPERA 
-		ld	r27, Y+					;Cargamos decena
-		ldi r29, 48					
-		add r27, r29				;Sumamos 48 para convertirlo en ASCII
-		sts UDR0,r27				;Enviamos por puerto serie
-		call USART_ESPERA
-	
-		call USART_ESPERA 
-		ld	r27, Y					;Cargamos unidad
-		ldi r29, 48
-		add r27, r29				;Sumamos 48 para convertirlo en ASCII 
-		sts UDR0,r27				;Enviamos por puerto serie
-		call USART_ESPERA	
-
-		SBIW YL, 1					;Poner el puntero en el primer BCD
-		ret
-
-;########################################################## MOSTRAR DECIMAL #########################################################
-
-	MOSTRAR_DECIMAL:
+	MOSTRAR:
 		
-		ld	r27, Z+					;Cargamos primer digito decimal
+		call USART_ESPERA
+		ld	r27, Z+					;Cargamos decena
 		ldi r29, 48
 		add r27, r29				;Sumamos 48 para convertirlo en ASCII
 		sts UDR0,r27				;Enviamos por puerto serie
 		call USART_ESPERA
 	
 		call USART_ESPERA
-		ld	r27, Z+					;Cargamos segundo digito decimal
+		ld	r27, Z+					;Cargamos unidad
+		ldi r29, 48
+		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+		sts UDR0,r27				;Enviamos por puerto serie
+		call USART_ESPERA
+
+		call USART_ESPERA			
+		ldi r20, 0x2C				; ,
+		sts UDR0, r20				;Enviamos por puerto serie
+
+		call USART_ESPERA
+		ld	r27, Z+					;Cargamos primer decimal
 		ldi r29, 48
 		add r27, r29				;Sumamos 48 para convertirlo en ASCII
 		sts UDR0,r27				;Enviamos por puerto serie
 		call USART_ESPERA
 
 		call USART_ESPERA
-		ld	r27, Z					;Cargamos tercer digito decimal
-		ldi r29, 48	
+		ld	r27, Z+					;Cargamos segundo decimal
+		ldi r29, 48
 		add r27, r29				;Sumamos 48 para convertirlo en ASCII
 		sts UDR0,r27				;Enviamos por puerto serie
-		call USART_ESPERA	
+		call USART_ESPERA
+	
+		call USART_ESPERA
+		ld	r27, Z					;Cargamos tercer decimal
+		ldi r29, 48
+		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+		sts UDR0,r27				;Enviamos por puerto serie
+		call USART_ESPERA
 
-		SBIW ZL, 2					;Poner el puntero en el primer BCD
-
+		SBIW ZL, 4					;Poner el puntero en el primer BCD
 		ret
-
+		
 ;########################################################## USART COMPARACION #########################################################
 
 	USART_COMPARACION:

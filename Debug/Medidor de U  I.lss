@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm Thu Aug 13 12:05:23 2020
+AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm Fri Aug 14 12:09:41 2020
 
 [builtin](2): Including file 'C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include\m328Pdef.inc'
                  
@@ -992,20 +992,60 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
                   ;############################################################### DECLARACION ##############################################################
                   ;##########################################################################################################################################
                  
-                 .def	ENTEROL=r12
-                 .def	ENTEROH=r13
-                 .def	RestoL=r14
-                 .def	RestoH=r15
-                 .def	DividendoL=r16
-                 .def	DividendoH=r17
-                 .def	DivisorL=r18
-                 .def	DivisorH=r19
-                 .def	Contador=r20
-                 .def	rBin2L=r21
-                 .def	rBin2H=r22
-                 .def	rmp=r23
-                 .def	DECIMALL=r24
-                 .def	DECIMALH=r25
+                 .def	ENTEROL=r12				;Subrutina mostrar
+                 .def	ENTEROH=r13				;Subrutina mostrar
+                 .def	RestoL=r14				;Subrutina division
+                 .def	RestoH=r15				;Subrutina division
+                 .def	DividendoL=r16			;Subrutina division
+                 .def	DividendoH=r17			;Subrutina division
+                 .def	DivisorL=r18			;Subrutina division
+                 .def	DivisorH=r19			;Subrutina division
+                 .def	Contador=r20			;Subrutina division
+                 .def	rBin2L=r21				;Subrutina descomposicion
+                 .def	rBin2H=r22				;Subrutina descomposicion
+                 .def	rmp=r23					;Subrutina descomposicion
+                 
+                 .MACRO	PUSH_SREG				;Guardo en la pila la posicion de memoria
+                 		push r13
+                 		in r13, SREG			;guardar registro de tranjo 12 tmb 
+                 		push r13
+                 		push r12
+                 		push r14
+                 		push r15
+                 		push r16
+                 		push r17
+                 		push r18
+                 		push r19
+                 		push r20
+                 		push r21
+                 		push r22
+                 		push r23
+                 		push r24
+                 		push r25
+                 		push r26
+                 		push r27
+                 .ENDMACRO
+                 
+                 .MACRO	POP_SREG
+                 		pop r27
+                 		pop r26
+                 		pop r25
+                 		pop r24
+                 		pop r23
+                 		pop r22
+                 		pop r21
+                 		pop r20
+                 		pop r19
+                 		pop r18
+                 		pop r17
+                 		pop r16
+                 		pop r15
+                 		pop r14
+                 		pop r12
+                 		pop r13
+                 		out sreg, r13				;recupero de la pila la posicion de memoria
+                 		pop r13
+                 .ENDMACRO
                  
                  .DSEG
                  .ORG 0x100
@@ -1013,60 +1053,18 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
 000101           	VAL_TensionADCL: .Byte 1
 000102           	VAL_CorrienteADCH: .Byte 1
 000103           	VAL_CorrienteADCL: .Byte 1
-000104           	Tension: .Byte 1
-000105           	TensionresH: .Byte 1
-000106           	TensionresL: .Byte 1
-000107           	PotenciaH: .Byte 1
-000108           	PotenciaL: .Byte 1
-000109           	Corriente: .Byte 1
-00010a           	CorrienteresH: .Byte 1
-00010b           	CorrienteresL: .Byte 1
-00010c           	RestodivL: .Byte 1
-00010d           	RestodivH: .Byte 1
-00010e           	VECTOR_DECIMAL: .Byte 3
-000111           	VECTOR_ENTERO: .Byte 2
-000113           	DATO_RX: .Byte 1
-                 
-                 .ORG 0x110
-                 	.MACRO	PUSH_SREG				;Guardo en la pila la posicion de memoria
-                 			push r13
-                 			in r13, SREG
-                 			push r13
-                 			push r14
-                 			push r15
-                 			push r16
-                 			push r17
-                 			push r18
-                 			push r19
-                 			push r20
-                 			push r21
-                 			push r22
-                 			push r23
-                 			push r24
-                 			push r25
-                 			push r26
-                 			push r27
-                 	.ENDMACRO
-                 .ORG 0x120
-                 	.MACRO	POP_SREG
-                 			pop r27
-                 			pop r26
-                 			pop r25
-                 			pop r24
-                 			pop r23
-                 			pop r22
-                 			pop r21
-                 			pop r20
-                 			pop r19
-                 			pop r18
-                 			pop r17
-                 			pop r16
-                 			pop r15
-                 			pop r14
-                 			pop r13
-                 			out sreg, r13				;recupero de la pila la posicion de memoria
-                 			pop r13
-                 	.ENDMACRO
+000104           	TensionH: .Byte 1
+000105           	TensionL: .Byte 1
+000106           	PotenciaH: .Byte 1
+000107           	PotenciaL: .Byte 1
+000108           	CorrienteH: .Byte 1
+000109           	CorrienteL: .Byte 1
+00010a           	RestodivL: .Byte 1
+00010b           	RestodivH: .Byte 1
+00010c           	VECTOR: .Byte 5
+000111           	DATO_RX: .Byte 1
+000112           	GRANDEH: .Byte 1
+000113           	GRANDEL: .Byte 1
                  
                  ;########################################################## VECTORES DE INTERRUPCION #########################################################
                  
@@ -1075,13 +1073,13 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
 000000 940c 0035 	jmp INICIO
                  
                  .ORG 0x000A
-00000a 940c 00a8 	jmp RTI_SELECT
+00000a 940c 00aa 	jmp RTI_SELECT
                  	
                  .ORG 0x001A
 00001a 940c 0075 	jmp RTI_TIMER1_OVF
                  
                  .ORG 0x0024
-000024 940c 01a5 	jmp USART_RXC
+000024 940c 01fd 	jmp USART_RXC
                  
                  .ORG 0x34
 000034 9518      	reti
@@ -1157,11 +1155,11 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
                  ;########################################################## BUCLE PRINCIPAL #########################################################
                  		
                  		BUCLE:
-000069 940e 00d4 			call ADC0
-00006b 940e 00ea 			call ADC1
-00006d 940e 0100 			call CALCULO_TENSION
-00006f 940e 0113 			call CALCULO_CORRIENTE
-000071 940e 0237 			call USART_COMPARACION
+000069 940e 00d8 			call ADC0
+00006b 940e 00ee 			call ADC1
+00006d 940e 0104 			call CALCULO_TENSION
+00006f 940e 0127 			call CALCULO_CORRIENTE
+000071 940e 0284 			call USART_COMPARACION
 000073 940c 0069 			jmp BUCLE
                  
                  ;########################################################## TRATAMIENTO DE INTERRUPCION DEL TIMER1 (salidas PWM 1-5 V) #########################################################
@@ -1170,252 +1168,277 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
 000075 92df
 000076 b6df
 000077 92df
-000078 92ef
-000079 92ff
-00007a 930f
-00007b 931f
-00007c 932f
-00007d 933f
-00007e 934f
-00007f 935f
-000080 936f
-000081 937f
-000082 938f
-000083 939f
-000084 93af
-000085 93bf      			PUSH_SREG						;guardo en la pila la posicion de memoria
+000078 92cf
+000079 92ef
+00007a 92ff
+00007b 930f
+00007c 931f
+00007d 932f
+00007e 933f
+00007f 934f
+000080 935f
+000081 936f
+000082 937f
+000083 938f
+000084 939f
+000085 93af
+000086 93bf      			PUSH_SREG						;guardo en la pila la posicion de memoria
+                 								
+000087 9150 0100 			lds r21, VAL_TensionADCH
+000089 9350 0089 			sts OCR1AH, r21					;salida PWMA timer OC1A
+00008b 9150 0101 			lds r21, VAL_TensionADCL	
+00008d 9350 0088 			sts OCR1AL, r21
                  			
-000086 9150 0100 			lds r21, VAL_TensionADCH
-000088 9350 0089 			sts OCR1AH, r21					;salida PWMA timer OC1A
-00008a 9150 0101 			lds r21, VAL_TensionADCL	
-00008c 9350 0088 			sts OCR1AL, r21
+00008f 9140 0102 			lds r20, VAL_CorrienteADCH
+000091 9340 008b 			sts OCR1BH, r20					;salida PWMB timer OC1B
+000093 9140 0103 			lds r20, VAL_CorrienteADCL	
+000095 9340 008a 			sts OCR1BL, r20
                  			
-00008e 9140 0102 			lds r20, VAL_CorrienteADCH
-000090 9340 008b 			sts OCR1BH, r20					;salida PWMB timer OC1B
-000092 9140 0103 			lds r20, VAL_CorrienteADCL	
-000094 9340 008a 			sts OCR1BL, r20
-                 			
-000096 91bf
-000097 91af
-000098 919f
-000099 918f
-00009a 917f
-00009b 916f
-00009c 915f
-00009d 914f
-00009e 913f
-00009f 912f
-0000a0 911f
-0000a1 910f
-0000a2 90ff
-0000a3 90ef
-0000a4 90df
-0000a5 bedf
-0000a6 90df      			POP_SREG						;recupero el valor de la pila
-0000a7 9518      			reti
+000097 91bf
+000098 91af
+000099 919f
+00009a 918f
+00009b 917f
+00009c 916f
+00009d 915f
+00009e 914f
+00009f 913f
+0000a0 912f
+0000a1 911f
+0000a2 910f
+0000a3 90ff
+0000a4 90ef
+0000a5 90cf
+0000a6 90df
+0000a7 bedf
+0000a8 90df      			POP_SREG					;recupero el valor de la pila
+0000a9 9518      			reti
                  
                  ;########################################################## INTERRUPCION POR PCINT0 #########################################################
                  
                  		RTI_SELECT:
-0000a8 92df
-0000a9 b6df
 0000aa 92df
-0000ab 92ef
-0000ac 92ff
-0000ad 930f
-0000ae 931f
-0000af 932f
-0000b0 933f
-0000b1 934f
-0000b2 935f
-0000b3 936f
-0000b4 937f
-0000b5 938f
-0000b6 939f
-0000b7 93af
-0000b8 93bf      			PUSH_SREG
+0000ab b6df
+0000ac 92df
+0000ad 92cf
+0000ae 92ef
+0000af 92ff
+0000b0 930f
+0000b1 931f
+0000b2 932f
+0000b3 933f
+0000b4 934f
+0000b5 935f
+0000b6 936f
+0000b7 937f
+0000b8 938f
+0000b9 939f
+0000ba 93af
+0000bb 93bf      			PUSH_SREG
                  
-0000b9 994f      			sbic PIND, PIND7				;Pregunta si PD7 esta en 0
-0000ba 940e 0154 			call MOSTRAR_POTENCIA			;Llama funcion para mostrar potencia
-0000bc 994e      			sbic PIND, PIND6				;Pregunta si PD6 esta en 0
-0000bd 940e 0155 			call MOSTRAR_CORRIENTE			;Llama funcion para mostrar corriente
-0000bf 994d      			sbic PIND, PIND5				;Pregunta si PD5 esta en 0
-0000c0 940e 0156 			call MOSTRAR_TENSION			;Llama funcion para mostrar tension
+0000bc 994f      			sbic PIND, PIND7				;Pregunta si PD7 esta en 0
+0000bd 940e 0171 			call MOSTRAR_POTENCIA			;Llama funcion para mostrar potencia
+0000bf 994e      			sbic PIND, PIND6				;Pregunta si PD6 esta en 0
+0000c0 940e 0172 			call MOSTRAR_CORRIENTE			;Llama funcion para mostrar corriente
+0000c2 994d      			sbic PIND, PIND5				;Pregunta si PD5 esta en 0
+0000c3 940e 01ba 			call MOSTRAR_TENSION			;Llama funcion para mostrar tension
                  			
-0000c2 91bf
-0000c3 91af
-0000c4 919f
-0000c5 918f
-0000c6 917f
-0000c7 916f
-0000c8 915f
-0000c9 914f
-0000ca 913f
-0000cb 912f
-0000cc 911f
-0000cd 910f
-0000ce 90ff
-0000cf 90ef
-0000d0 90df
-0000d1 bedf
-0000d2 90df      			POP_SREG
-0000d3 9518      			reti
+0000c5 91bf
+0000c6 91af
+0000c7 919f
+0000c8 918f
+0000c9 917f
+0000ca 916f
+0000cb 915f
+0000cc 914f
+0000cd 913f
+0000ce 912f
+0000cf 911f
+0000d0 910f
+0000d1 90ff
+0000d2 90ef
+0000d3 90cf
+0000d4 90df
+0000d5 bedf
+0000d6 90df      			POP_SREG
+0000d7 9518      			reti
                  
                  ;########################################################## SUBRUTINA PARA LEER ADC0 ###################################################################
                  	
                  	ADC0:
                  
                  			// *** Configuramos ADMUX ***
-0000d4 e400      		ldi r16, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(0<<MUX0) 
-0000d5 9300 007c 		sts ADMUX, r16  
+0000d8 e400      		ldi r16, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(0<<MUX0) 
+0000d9 9300 007c 		sts ADMUX, r16  
                  			; Referencia de Voltaje Con AVCC y Capacitor. Activamos ADC, Canal ADC0    
                  
                  		// *** Iniciamos conversión en ADC0 *** 
-0000d7 ee0f      		ldi r16, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
-0000d8 9300 007a 		sts ADCSRA, r16 
-0000da e006      		ldi r16, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
-0000db 9300 007b 		sts ADCSRB, r16
+0000db ee0f      		ldi r16, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
+0000dc 9300 007a 		sts ADCSRA, r16 
+0000de e006      		ldi r16, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
+0000df 9300 007b 		sts ADCSRB, r16
                  
                  		adcLeerADC0:
-0000dd 9100 007a 		lds r16, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
-0000df fd06      		SBRC r16, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
-0000e0 cffc      		rjmp adcLeerADC0 
+0000e1 9100 007a 		lds r16, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
+0000e3 fd06      		SBRC r16, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
+0000e4 cffc      		rjmp adcLeerADC0 
                  			
-0000e1 9110 0078 		lds r17, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
-0000e3 9100 0079 		lds r16, ADCH  ; Cargamos parte alta del ADC en el registro 16.
-0000e5 9310 0103 		sts VAL_CorrienteADCL, r17 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
-0000e7 9300 0102 		sts VAL_CorrienteADCH, r16
+0000e5 9110 0078 		lds r17, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
+0000e7 9100 0079 		lds r16, ADCH  ; Cargamos parte alta del ADC en el registro 16.
+0000e9 9310 0103 		sts VAL_CorrienteADCL, r17 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
+0000eb 9300 0102 		sts VAL_CorrienteADCH, r16
                  	
-0000e9 9508      		ret
+0000ed 9508      		ret
                  			
                  ;################################################################### SUBRUTINA PARA LEER ADC1 ###################################################################
                  
                  	ADC1:
                  
                  			// *** Configuramos ADMUX ***
-0000ea e421      		ldi r18, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(1<<MUX0) 
-0000eb 9320 007c 		sts ADMUX, r18  
+0000ee e421      		ldi r18, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(1<<MUX0) 
+0000ef 9320 007c 		sts ADMUX, r18  
                  			; Referencia de Voltaje Con AVCC y Capacitor. Activamos ADC, Canal ADC0    
                  
                  		// *** Iniciamos conversión en ADC0 *** 
-0000ed ee2f      		ldi r18, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
-0000ee 9320 007a 		sts ADCSRA, r18 
-0000f0 e026      		ldi r18, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
-0000f1 9320 007b 		sts ADCSRB, r18
+0000f1 ee2f      		ldi r18, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
+0000f2 9320 007a 		sts ADCSRA, r18 
+0000f4 e026      		ldi r18, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
+0000f5 9320 007b 		sts ADCSRB, r18
                  
                  		adcLeerADC1:
-0000f3 9120 007a 		lds r18, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
-0000f5 fd26      		SBRC r18, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
-0000f6 cffc      		rjmp adcLeerADC1 
+0000f7 9120 007a 		lds r18, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
+0000f9 fd26      		SBRC r18, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
+0000fa cffc      		rjmp adcLeerADC1 
                  			
-0000f7 9120 0078 		lds r18, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
-0000f9 9130 0079 		lds r19, ADCH  ; Cargamos parte alta del ADC en el registro 16.
-0000fb 9320 0101 		sts VAL_TensionADCL, r18 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
-0000fd 9330 0100 		sts VAL_TensionADCH, r19
+0000fb 9120 0078 		lds r18, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
+0000fd 9130 0079 		lds r19, ADCH  ; Cargamos parte alta del ADC en el registro 16.
+0000ff 9320 0101 		sts VAL_TensionADCL, r18 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
+000101 9330 0100 		sts VAL_TensionADCH, r19
                  	
-0000ff 9508      		ret	
+000103 9508      		ret	
                  ;################################################################### CALCULO DE TENSION ###################################################################
                  	
                  	CALCULO_TENSION:
                  		
-000100 9170 0100 		lds R23, VAL_TensionADCH
-000102 9160 0101 		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
-000104 e050      		ldi R21,0x00
-000105 e149      		ldi R20,0x19						;Carga el numero 25 r21:r20
-000106 940e 012b 		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
-                 	
-000108 ef2f      		ldi	DivisorL,0xFF					;el dividendo ya esta en r16 y r17
-000109 e033      		ldi	DivisorH,0x03					;Dividimos por 1023, para llevar resultado de 0 a 25
-00010a 940e 013d 		call Division16_16
-00010c 9300 0104 		sts	Tension, DividendoL				;Valor de la tension real
+000104 9170 0100 		lds R23, VAL_TensionADCH
+000106 9160 0101 		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
+000108 e050      		ldi R21,0x00
+000109 e148      		ldi R20,0x18						;Carga el numero 24 r21:r20
+00010a 940e 0148 		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
+00010c 9310 0112 		sts GRANDEH, r17					;Guardamos resultado de la primer multiplicacion
+00010e 9300 0113 		sts GRANDEL, r16
                  
-00010e 92f0 0105 		sts TensionresH, r15				;parte decimal del resto de la divison
-000110 92e0 0106 		sts TensionresL, r14
-                 		
-000112 9508      		ret
+000110 9170 0100 		lds R23, VAL_TensionADCH
+000112 9160 0101 		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
+000114 e050      		ldi R21,0x00
+000115 e24b      		ldi R20,0x2B						;Carga el numero 43 r21:r20
+000116 940e 0148 		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
+                 	
+000118 e624      		ldi	DivisorL,0x64					;El dividendo ya esta en r16 y r17
+000119 e030      		ldi	DivisorH,0x00					;Dividimos por 100
+00011a 940e 015a 		call Division16_16
+                 
+00011c 9130 0112 		lds r19, GRANDEH
+00011e 9120 0113 		lds r18, GRANDEL
+                 
+000120 0f31      		add r19, DividendoH					;Sumamos primer calculo con segundo calculo
+000121 1f20      		adc r18, DividendoL
+000122 9330 0104 		sts	TensionH, r19					;Valor de la tension real
+000124 9320 0105 		sts	TensionL, r18
+000126 9508      		ret
                  
                  ;################################################################### CALCULO DE CORRIENTE ###################################################################
                   
                  	CALCULO_CORRIENTE:
                  
-000113 9170 0102 		lds r23, VAL_CorrienteADCH			;Carga valores del ADC
-000115 9160 0103 		lds r22, VAL_CorrienteADCL
-000117 e081      		ldi r24, 0x01						;Carga complemento de 511 para restar
-000118 ef9e      		ldi r25, 0xFE
-000119 0f68      		add r22, r24						;Realiza suma (resta)
-00011a 1f79      		adc r23, r25
-00011b e070      		ldi r23, 0x00						;Ponemos 0 en la parte alta del resultado
-00011c e052      		ldi r21, 0x02						;Carga 587 (factor para adecuar la medicion) para multiplicar
-00011d e44b      		ldi r20, 0x4B
-00011e 940e 012b 		call mul16x16_16					;Llama funcion multiplicacion
+000127 9170 0102 		lds r23, VAL_CorrienteADCH			;Carga valores del ADC
+000129 9160 0103 		lds r22, VAL_CorrienteADCL
+00012b e081      		ldi r24, 0x01						;Carga complemento de 511 para restar
+00012c ef9e      		ldi r25, 0xFE
+00012d 0f68      		add r22, r24						;Realiza suma (resta)
+00012e 1f79      		adc r23, r25
+00012f e070      		ldi r23, 0x00						;Ponemos 0 en la parte alta del resultado
+000130 e052      		ldi r21, 0x02						;Carga 587 (factor para adecuar la medicion) para multiplicar
+000131 e44b      		ldi r20, 0x4B
+000132 940e 0148 		call mul16x16_16					;Llama funcion multiplicacion
                  
-000120 e237      		ldi DivisorH, 0x27					;Carga 10000 en el divisor (para obtener nuestro factor >> 0.0587)
-000121 e120      		ldi DivisorL, 0x10
-000122 940e 013d 		call Division16_16					;Llama funcion division
+000134 e030      		ldi DivisorH, 0x00					;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
+000135 e02a      		ldi DivisorL, 0x0A
+000136 940e 015a 		call Division16_16					;Llama funcion division
                  
-000124 9300 0109 		sts Corriente, r16					;Resultado corriente
-000126 92f0 010a 		sts CorrienteresH, r15				;Parte decimal de la division
-000128 92e0 010b 		sts CorrienteresL, r14
-00012a 9508      		ret
+000138 9310 0108 		sts CorrienteH, r17					;Resultado corriente
+00013a 9300 0109 		sts CorrienteL, r16				
+00013c 9508      		ret
+                 
+                 ;################################################################### CALCULO DE POTENCIA ###################################################################
+                  
+                 	CALCULO_POTENCIA:
+                 
+00013d 9170 0104 		lds r23, TensionH
+00013f 9160 0105 		lds r22, TensionL
+000141 9150 0108 		lds r21, CorrienteH
+000143 9140 0109 		lds r20, CorrienteL
+000145 940e 0148 		call mul16x16_16					;Llama funcion multiplicacion
+                 
+000147 9508      		ret
                  		
                  ;################################################################### FUNCION DE MULTIPLICACION ###################################################################
                  
                  	mul16x16_16:
                  
-00012b 9f64      		mul	r22, r20				; al * bl
-00012c 0180      		movw	r17:r16, r1:r0
-00012d 9f74      		mul	r23, r20				; ah * bl
-00012e 0d10      		add	r17, r0
-00012f 9f56      		mul	r21, r22				; bh * al
-000130 0d10      		add	r17, r0
+000148 9f64      		mul	r22, r20				; al * bl
+000149 0180      		movw	r17:r16, r1:r0
+00014a 9f74      		mul	r23, r20				; ah * bl
+00014b 0d10      		add	r17, r0
+00014c 9f56      		mul	r21, r22				; bh * al
+00014d 0d10      		add	r17, r0
                  		;resultado r17, r16
-000131 9508      		ret
+00014e 9508      		ret
                  
                  ;############################################################ FUNCION DE MULTIPLICACION DEL RESTO ###################################################################
                  
                  	mul16x16_24:
-000132 9f75      		mul		r23, r21		; ah * bh
-000133 2d20      		mov		r18, r0
-000134 9f64      		mul		r22, r20		; al * bl
-000135 0180      		movw	r17:r16, r1:r0
-000136 9f74      		mul		r23, r20		; ah * bl
-000137 0d10      		add		r17, r0
-000138 1d21      		adc		r18, r1
-000139 9f56      		mul		r21, r22		; bh * al
-00013a 0d10      		add		r17, r0
-00013b 1d21      		adc		r18, r1
+00014f 9f75      		mul		r23, r21		; ah * bh
+000150 2d20      		mov		r18, r0
+000151 9f64      		mul		r22, r20		; al * bl
+000152 0180      		movw	r17:r16, r1:r0
+000153 9f74      		mul		r23, r20		; ah * bl
+000154 0d10      		add		r17, r0
+000155 1d21      		adc		r18, r1
+000156 9f56      		mul		r21, r22		; bh * al
+000157 0d10      		add		r17, r0
+000158 1d21      		adc		r18, r1
                  		; resultado r18, r17, r16
-00013c 9508      		ret
+000159 9508      		ret
                  
                  
                  ;################################################################### FUNCION DE DIVISION ###################################################################
                  
                  	Division16_16:	
-00013d 24ee      		clr	RestoL					; borra byte low de Resto
-00013e 18ff      		sub	RestoH,RestoH			; borra el byte alto y acarreo
-00013f e141      		ldi	Contador,17				; contador de bucle infinito
+00015a 24ee      		clr	RestoL					; borra byte low de Resto
+00015b 18ff      		sub	RestoH,RestoH			; borra el byte alto y acarreo
+00015c e141      		ldi	Contador,17				; contador de bucle infinito
                  		div_1:	
-000140 1f00      		rol	DividendoL				; desplazo a la izquierda el dividendo
-000141 1f11      		rol	DividendoH
-000142 954a      		dec	Contador				; decremento contador
-000143 f429      		brne	div_2				;if done
-                 		;sts	Tension, DividendoL	; este valor se multiplica por 5
-000144 92e0 010c 		sts RestodivL, RestoL
-000146 92f0 010d 		sts RestodivH, RestoH
-000148 9508      		ret							; salida
+00015d 1f00      		rol	DividendoL				; desplazo a la izquierda el dividendo
+00015e 1f11      		rol	DividendoH
+00015f 954a      		dec	Contador				; decremento contador
+000160 f429      		brne	div_2				;if done
+000161 92e0 010a 		sts RestodivL, RestoL
+000163 92f0 010b 		sts RestodivH, RestoH
+000165 9508      		ret							; salida
                  		div_2:	
-000149 1cee      		rol	RestoL					;desplazo a la izquerda el resto
-00014a 1cff      		rol	RestoH
-00014b 1ae2      		sub	RestoL,DivisorL			;resto = resto - divisor
-00014c 0af3      		sbc	RestoH,DivisorH	
-00014d f420      		brcc	div_3				;si el resultado es negativo
-00014e 0ee2      		add	RestoL,DivisorL			; restaurar el resto
-00014f 1ef3      		adc	RestoH,DivisorH
-000150 9488      		clc							;limpia el acarreo para ser deplazado al resultado
-000151 cfee      		rjmp	div_1				;else
+000166 1cee      		rol	RestoL					;desplazo a la izquerda el resto
+000167 1cff      		rol	RestoH
+000168 1ae2      		sub	RestoL,DivisorL			;resto = resto - divisor
+000169 0af3      		sbc	RestoH,DivisorH	
+00016a f420      		brcc	div_3				;si el resultado es negativo
+00016b 0ee2      		add	RestoL,DivisorL			; restaurar el resto
+00016c 1ef3      		adc	RestoH,DivisorH
+00016d 9488      		clc							;limpia el acarreo para ser deplazado al resultado
+00016e cfee      		rjmp	div_1				;else
                  		div_3:	
-000152 9408      		sec							;pone a 1 la bandera de acarreo para ser trasladado al resultado
-000153 cfec      		rjmp	div_1
+00016f 9408      		sec							;pone a 1 la bandera de acarreo para ser trasladado al resultado
+000170 cfec      		rjmp	div_1
                  		; resultado de la division r17, r16
                  		; resto de la division r15, r14
                  
@@ -1423,284 +1446,302 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
                  
                  	MOSTRAR_POTENCIA:
                  
+                 		
                  
-                 
-000154 9508      		ret
+000171 9508      		ret
                  
                  ;######################################################### MOSTRAR CORRIENTE #########################################################
                  
                  	MOSTRAR_CORRIENTE:
+                 		
+000172 90d0 0108 		lds ENTEROH, CorrienteH		;Cargar valor de corriente alta
+000174 90c0 0109 		lds ENTEROL, CorrienteL		;Cargar valor de corriente baja
+                 		
+000176 940e 022b 		call DESCOMPOSICION
+                 				
+000178 940e 0226 		call USART_ESPERA			
+00017a e449      		ldi r20, 0x49				; I
+00017b 9340 00c6 		sts UDR0, r20
                  
+00017d 940e 0226 		call USART_ESPERA
+00017f e240      		ldi r20, 0x20				; (espacio)
+000180 9340 00c6 		sts UDR0, r20
                  
+000182 940e 0226 		call USART_ESPERA			
+000184 e34d      		ldi r20, 0x3D				; =
+000185 9340 00c6 		sts UDR0, r20
                  
-000155 9508      		ret
+000187 940e 0226 		call USART_ESPERA
+000189 e240      		ldi r20, 0x20				; (espacio)
+00018a 9340 00c6 		sts UDR0, r20
+                 
+00018c 940e 0250 		call MOSTRAR
+                 
+00018e 940e 0226 		call USART_ESPERA
+000190 e240      		ldi r20, 0x20				; (espacio)
+000191 9340 00c6 		sts UDR0, r20
+                 
+000193 940e 0226 		call USART_ESPERA			
+000195 e441      		ldi r20, 0x41				; A
+000196 9340 00c6 		sts UDR0, r20
+                 
+000198 940e 0226 		call USART_ESPERA			
+00019a e64d      		ldi r20, 0x6D				; m
+00019b 9340 00c6 		sts UDR0, r20
+                 
+00019d 940e 0226 		call USART_ESPERA			
+00019f e740      		ldi r20, 0x70				; p
+0001a0 9340 00c6 		sts UDR0, r20
+                 
+0001a2 940e 0226 		call USART_ESPERA			
+0001a4 e645      		ldi r20, 0x65				; e
+0001a5 9340 00c6 		sts UDR0, r20
+                 		
+0001a7 940e 0226 		call USART_ESPERA			
+0001a9 e742      		ldi r20, 0x72				; r
+0001aa 9340 00c6 		sts UDR0, r20
+                 
+0001ac 940e 0226 		call USART_ESPERA			
+0001ae e04a      		ldi r20, 0x0A				; (salto de linea)
+0001af 9340 00c6 		sts UDR0, r20
+                 
+0001b1 940e 0226 		call USART_ESPERA			
+0001b3 e04d      		ldi r20, 0x0D				; (retorno de carro)
+0001b4 9340 00c6 		sts UDR0, r20
+                 
+0001b6 2711      		clr r17						;Limpiar registro de dato recibido
+0001b7 9310 0111 		sts DATO_RX, r17
+                 	
+0001b9 9508      		ret
                  
                  ;########################################################## MOSTRAR TENSION #########################################################
                  
                  	MOSTRAR_TENSION:
                  
-000156 24dd      		clr ENTEROH					;Poner regitro en 0x00
-000157 90c0 0104 		lds ENTEROL, Tension		;Cargar valor de tension
-000159 9190 0105 		lds DECIMALH, TensionresH	;Cargar valor decimal de tension
-00015b 9180 0106 		lds DECIMALL, TensionresL
+0001ba 90d0 0104 		lds ENTEROH, TensionH		;Cargar valor de tension alta
+0001bc 90c0 0105 		lds ENTEROL, TensionL		;Cargar valor de tension baja
                  		
-00015d 940e 01d1 		call DESCOMPOSICION_ENTERO	
-00015f 940e 01e7 		call DESCOMPOSICION_DECIMAL
+0001be 940e 022b 		call DESCOMPOSICION
                  				
-000161 940e 01cc 		call USART_ESPERA			
-000163 e546      		ldi r20, 0x56				; V
-000164 9340 00c6 		sts UDR0, r20
+0001c0 940e 0226 		call USART_ESPERA			
+0001c2 e546      		ldi r20, 0x56				; V
+0001c3 9340 00c6 		sts UDR0, r20
                  
-000166 940e 01cc 		call USART_ESPERA
-000168 e240      		ldi r20, 0x20				; (espacio)
-000169 9340 00c6 		sts UDR0, r20
+0001c5 940e 0226 		call USART_ESPERA
+0001c7 e240      		ldi r20, 0x20				; (espacio)
+0001c8 9340 00c6 		sts UDR0, r20
                  
-00016b 940e 01cc 		call USART_ESPERA			
-00016d e34d      		ldi r20, 0x3D				; =
-00016e 9340 00c6 		sts UDR0, r20
+0001ca 940e 0226 		call USART_ESPERA			
+0001cc e34d      		ldi r20, 0x3D				; =
+0001cd 9340 00c6 		sts UDR0, r20
                  
-000170 940e 01cc 		call USART_ESPERA
-000172 e240      		ldi r20, 0x20				; (espacio)
-000173 9340 00c6 		sts UDR0, r20
+0001cf 940e 0226 		call USART_ESPERA
+0001d1 e240      		ldi r20, 0x20				; (espacio)
+0001d2 9340 00c6 		sts UDR0, r20
                  
-000175 940e 0208 		call MOSTRAR_ENTERO
+0001d4 940e 0250 		call MOSTRAR
                  
-000177 940e 01cc 		call USART_ESPERA			
-000179 e24c      		ldi r20, 0x2C				; ,
-00017a 9340 00c6 		sts UDR0, r20
+0001d6 940e 0226 		call USART_ESPERA
+0001d8 e240      		ldi r20, 0x20				; (espacio)
+0001d9 9340 00c6 		sts UDR0, r20
                  
-00017c 940e 021c 		call MOSTRAR_DECIMAL
+0001db 940e 0226 		call USART_ESPERA			
+0001dd e546      		ldi r20, 0x56				; V
+0001de 9340 00c6 		sts UDR0, r20
                  
-00017e 940e 01cc 		call USART_ESPERA
-000180 e240      		ldi r20, 0x20				; (espacio)
-000181 9340 00c6 		sts UDR0, r20
+0001e0 940e 0226 		call USART_ESPERA			
+0001e2 e64f      		ldi r20, 0x6F				; o
+0001e3 9340 00c6 		sts UDR0, r20
                  
-000183 940e 01cc 		call USART_ESPERA			
-000185 e546      		ldi r20, 0x56				; V
-000186 9340 00c6 		sts UDR0, r20
+0001e5 940e 0226 		call USART_ESPERA			
+0001e7 e64c      		ldi r20, 0x6C				; l
+0001e8 9340 00c6 		sts UDR0, r20
                  
-000188 940e 01cc 		call USART_ESPERA			
-00018a e64f      		ldi r20, 0x6F				; o
-00018b 9340 00c6 		sts UDR0, r20
-                 
-00018d 940e 01cc 		call USART_ESPERA			
-00018f e64c      		ldi r20, 0x6C				; l
-000190 9340 00c6 		sts UDR0, r20
-                 
-000192 940e 01cc 		call USART_ESPERA			
-000194 e744      		ldi r20, 0x74				; t
-000195 9340 00c6 		sts UDR0, r20
+0001ea 940e 0226 		call USART_ESPERA			
+0001ec e744      		ldi r20, 0x74				; t
+0001ed 9340 00c6 		sts UDR0, r20
                  		
-000197 940e 01cc 		call USART_ESPERA			
-000199 e04a      		ldi r20, 0x0A				; (salto de linea)
-00019a 9340 00c6 		sts UDR0, r20
+0001ef 940e 0226 		call USART_ESPERA			
+0001f1 e04a      		ldi r20, 0x0A				; (salto de linea)
+0001f2 9340 00c6 		sts UDR0, r20
                  
-00019c 940e 01cc 		call USART_ESPERA			
-00019e e04d      		ldi r20, 0x0D				; (retorno de carro)
-00019f 9340 00c6 		sts UDR0, r20
+0001f4 940e 0226 		call USART_ESPERA			
+0001f6 e04d      		ldi r20, 0x0D				; (retorno de carro)
+0001f7 9340 00c6 		sts UDR0, r20
                  
-0001a1 2711      		clr r17						;Limpiar registro de dato recibido
-0001a2 9310 0113 		sts DATO_RX, r17
-0001a4 9508      		ret
+0001f9 2711      		clr r17						;Limpiar registro de dato recibido
+0001fa 9310 0111 		sts DATO_RX, r17
+0001fc 9508      		ret
                  
                  ;########################################################## USART RECEPCION #########################################################
                  
                  	USART_RXC:
                  
-0001a5 92df
-0001a6 b6df
-0001a7 92df
-0001a8 92ef
-0001a9 92ff
-0001aa 930f
-0001ab 931f
-0001ac 932f
-0001ad 933f
-0001ae 934f
-0001af 935f
-0001b0 936f
-0001b1 937f
-0001b2 938f
-0001b3 939f
-0001b4 93af
-0001b5 93bf      		PUSH_SREG
-0001b6 9100 00c6 		lds r16, UDR0
-0001b8 9300 0113 		sts DATO_RX, r16
-0001ba 91bf
-0001bb 91af
-0001bc 919f
-0001bd 918f
-0001be 917f
-0001bf 916f
-0001c0 915f
-0001c1 914f
-0001c2 913f
-0001c3 912f
-0001c4 911f
-0001c5 910f
-0001c6 90ff
-0001c7 90ef
-0001c8 90df
-0001c9 bedf
-0001ca 90df      		POP_SREG
-0001cb 9518      		reti
+0001fd 92df
+0001fe b6df
+0001ff 92df
+000200 92cf
+000201 92ef
+000202 92ff
+000203 930f
+000204 931f
+000205 932f
+000206 933f
+000207 934f
+000208 935f
+000209 936f
+00020a 937f
+00020b 938f
+00020c 939f
+00020d 93af
+00020e 93bf      		PUSH_SREG
+00020f 9100 00c6 		lds r16, UDR0
+000211 9300 0111 		sts DATO_RX, r16
+000213 91bf
+000214 91af
+000215 919f
+000216 918f
+000217 917f
+000218 916f
+000219 915f
+00021a 914f
+00021b 913f
+00021c 912f
+00021d 911f
+00021e 910f
+00021f 90ff
+000220 90ef
+000221 90cf
+000222 90df
+000223 bedf
+000224 90df      		POP_SREG
+000225 9518      		reti
                  
                  ;########################################################## USART ESPERA #########################################################
                  
                  	USART_ESPERA:
                  
-0001cc 91a0 00c0 		lds r26, UCSR0A				;Espera que se limpie la bandera de transmicion
-0001ce ffa5      		sbrs r26, UDRE0
-0001cf cffc      		rjmp USART_ESPERA
-0001d0 9508      		ret
+000226 91a0 00c0 		lds r26, UCSR0A				;Espera que se limpie la bandera de transmicion
+000228 ffa5      		sbrs r26, UDRE0
+000229 cffc      		rjmp USART_ESPERA
+00022a 9508      		ret
                  
                  ;########################################################## DESCOMPOSICION ENTERO #########################################################
                  		
-                 	DESCOMPOSICION_ENTERO:
+                 	DESCOMPOSICION:
                  
-0001d1 91c0 0011 		lds	YL, LOW(VECTOR_ENTERO)
-0001d3 e070      		ldi rmp, 0x00				;Cargamos 10
-0001d4 2f67      		mov rBin2H,rmp
-0001d5 e07a      		ldi rmp, 0x0A
-0001d6 2f57      		mov rBin2L,rmp
-0001d7 d003      		rcall Bin2ToDigitE			;Funcion para calcular digito
-0001d8 82c8      		st y,ENTEROL
-0001d9 9721      		sbiw YL,1					;Poner el puntero en el primer BCD
-0001da 9508      		ret
-                 
-                 	Bin2ToDigitE:
-0001db 2777      		clr rmp						;Conteo en cero
-                 
-                 	Bin2ToDigitaE:
-0001dc 16d6      		cp ENTEROH,rBin2H			;Comparo nro con comparacion parte alta
-0001dd f038      		brcs Bin2ToDigitcE			;Si Carry=1 el nro es menor a comparacion, vuelve a rutina para comparar con un valor menor
-0001de f411      		brne Bin2ToDigitbE	
-0001df 16c5      		cp ENTEROL,rBin2L			;Si es igual, Comparo nro con comparacion parte baja
-0001e0 f020      		brcs Bin2ToDigitcE			;Si Carry=1 el nro es menor a comparacion
-                 
-                 	Bin2ToDigitbE:			
-0001e1 1ac5      		sub ENTEROL,rBin2L			;Resto partes bajas
-0001e2 0ad6      		sbc ENTEROH,rBin2H			;Resto partes altas con carry
-0001e3 9573      		inc rmp						;Incremento cuenta para digito BCD
-0001e4 cff7      		rjmp Bin2ToDigitaE			;Repito el proceso hasta que sea menor a comparacion
-                 
-                 	Bin2ToDigitcE:
-0001e5 9379      		st y+,rmp					;Salva el digito 
-0001e6 9508      		ret
-                 
-                 ;########################################################## DESCOMPOSICION DECIMAL #########################################################
-                 		
-                 	DESCOMPOSICION_DECIMAL:
-                 
-0001e7 91e0 000e 		lds	ZL, LOW(VECTOR_DECIMAL)
-0001e9 91f0 0001 		lds	ZH, HIGH(VECTOR_DECIMAL)		
-0001eb e277      		ldi rmp, 0X27				;Cargamos 10000
-0001ec 2f67      		mov rBin2H,rmp
-0001ed e170      		ldi rmp, 0x10
-0001ee 2f57      		mov rBin2L,rmp
-0001ef d00c      		rcall Bin2ToDigit			;Funcion para calcular digito
-0001f0 e073      		ldi rmp, 0x03				;Cargamos 1000
-0001f1 2f67      		mov rBin2H,rmp
-0001f2 ee78      		ldi rmp, 0xE8
-0001f3 2f57      		mov rBin2L,rmp
-0001f4 d007      		rcall Bin2ToDigit			;Funcion para calcular digito
-0001f5 e070      		ldi rmp, 0x00				;Cargamos 100
-0001f6 2f67      		mov rBin2H,rmp
-0001f7 e674      		ldi rmp, 0x64
-0001f8 2f57      		mov rBin2L,rmp
-0001f9 d002      		rcall Bin2ToDigit			;Funcion para calcular digito
-0001fa 9732      		sbiw ZL,2					;Poner el puntero en el primer BCD
-0001fb 9508      		ret
+00022b e0ec      		ldi	ZL, LOW(VECTOR)
+00022c e0f1      		ldi	ZH, HIGH(VECTOR)			
+00022d e277      		ldi rmp, 0x27				;Cargamos 10000
+00022e 2f67      		mov rBin2H,rmp
+00022f e170      		ldi rmp, 0x10
+000230 2f57      		mov rBin2L,rmp
+000231 d012      		rcall Bin2ToDigit			;Funcion para calcular digito
+000232 e073      		ldi rmp, 0x03				;Cargamos 1000
+000233 2f67      		mov rBin2H,rmp
+000234 ee78      		ldi rmp, 0xE8
+000235 2f57      		mov rBin2L,rmp
+000236 d00d      		rcall Bin2ToDigit			;Funcion para calcular digito
+000237 e070      		ldi rmp, 0x00				;Cargamos 100
+000238 2f67      		mov rBin2H,rmp
+000239 e674      		ldi rmp, 0x64
+00023a 2f57      		mov rBin2L,rmp
+00023b d008      		rcall Bin2ToDigit			;Funcion para calcular digito
+00023c e070      		ldi rmp, 0x00				;Cargamos 10
+00023d 2f67      		mov rBin2H,rmp
+00023e e07a      		ldi rmp, 0x0A
+00023f 2f57      		mov rBin2L,rmp
+000240 d003      		rcall Bin2ToDigit			;Funcion para calcular digito
+000241 82c0      		st z,ENTEROL
+000242 9734      		sbiw ZL,4					;Poner el puntero en el primer BCD
+000243 9508      		ret
                  
                  	Bin2ToDigit:
-0001fc 2777      		clr rmp						;Conteo en cero
+000244 2777      		clr rmp						;Conteo en cero
                  
                  	Bin2ToDigita:
-0001fd 1796      		cp DECIMALH,rBin2H			;Comparo nro con comparacion parte alta
-0001fe f038      		brcs Bin2ToDigitc			;Si Carry=1 el nro es menor a comparacion, vuelve a rutina para comparar con un valor menor
-0001ff f411      		brne Bin2ToDigitb	
-000200 1785      		cp DECIMALL,rBin2L			;Si es igual, Comparo nro con comparacion parte baja
-000201 f020      		brcs Bin2ToDigitc			;Si Carry=1 el nro es menor a comparacion
+000245 16d6      		cp ENTEROH,rBin2H			; Comparo nro con comparacion parte alta
+000246 f038      		brcs Bin2ToDigitc			; Si Carry=1 el nro es menor a comparacion, vuelve a rutina para comparar con un valor menor
+000247 f411      		brne Bin2ToDigitb	 
+000248 16c5      		cp ENTEROL,rBin2L			; Si es igual, Comparo nro con comparacion parte baja
+000249 f020      		brcs Bin2ToDigitc			; Si Carry=1 nro menor a comparacion
                  
                  	Bin2ToDigitb:			
-000202 1b85      		sub DECIMALL,rBin2L			;Resto partes bajas
-000203 0b96      		sbc DECIMALH,rBin2H			;Resto partes altas con carry
-000204 9573      		inc rmp						;Incremento cuenta para digito BCD
-000205 cff7      		rjmp Bin2ToDigita			;Repito el proceso hasta que sea menor a comparacion
+00024a 1ac5      		sub ENTEROL,rBin2L			; Resto partes bajas
+00024b 0ad6      		sbc ENTEROH,rBin2H			; Resto partes altas con carry
+00024c 9573      		inc rmp						; Incremento cuenta para digito BCD
+00024d cff7      		rjmp Bin2ToDigita			; Repito el proceso hasta que sea menor a comparacion
                  
                  	Bin2ToDigitc:
-000206 9371      		st z+,rmp					;Salva el digito 
-000207 9508      		ret
+00024e 9371      		st z+,rmp					; Salva el digito 
+00024f 9508      		ret
                  
                  ;########################################################## MOSTRAR ENTERO #########################################################
                  	
-                 	MOSTRAR_ENTERO:
-                 
-000208 940e 01cc 		call USART_ESPERA 
-00020a 91b9      		ld	r27, Y+					;Cargamos decena
-00020b e3d0      		ldi r29, 48					
-00020c 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
-00020d 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
-00020f 940e 01cc 		call USART_ESPERA
-                 	
-000211 940e 01cc 		call USART_ESPERA 
-000213 81b8      		ld	r27, Y					;Cargamos unidad
-000214 e3d0      		ldi r29, 48
-000215 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII 
-000216 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
-000218 940e 01cc 		call USART_ESPERA	
-                 
-00021a 9721      		SBIW YL, 1					;Poner el puntero en el primer BCD
-00021b 9508      		ret
-                 
-                 ;########################################################## MOSTRAR DECIMAL #########################################################
-                 
-                 	MOSTRAR_DECIMAL:
+                 	MOSTRAR:
                  		
-00021c 91b1      		ld	r27, Z+					;Cargamos primer digito decimal
-00021d e3d0      		ldi r29, 48
-00021e 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
-00021f 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
-000221 940e 01cc 		call USART_ESPERA
+000250 940e 0226 		call USART_ESPERA
+000252 91b1      		ld	r27, Z+					;Cargamos decena
+000253 e3d0      		ldi r29, 48
+000254 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+000255 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
+000257 940e 0226 		call USART_ESPERA
                  	
-000223 940e 01cc 		call USART_ESPERA
-000225 91b1      		ld	r27, Z+					;Cargamos segundo digito decimal
-000226 e3d0      		ldi r29, 48
-000227 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
-000228 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
-00022a 940e 01cc 		call USART_ESPERA
+000259 940e 0226 		call USART_ESPERA
+00025b 91b1      		ld	r27, Z+					;Cargamos unidad
+00025c e3d0      		ldi r29, 48
+00025d 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+00025e 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
+000260 940e 0226 		call USART_ESPERA
                  
-00022c 940e 01cc 		call USART_ESPERA
-00022e 81b0      		ld	r27, Z					;Cargamos tercer digito decimal
-00022f e3d0      		ldi r29, 48	
-000230 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
-000231 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
-000233 940e 01cc 		call USART_ESPERA	
+000262 940e 0226 		call USART_ESPERA			
+000264 e24c      		ldi r20, 0x2C				; ,
+000265 9340 00c6 		sts UDR0, r20				;Enviamos por puerto serie
                  
-000235 9732      		SBIW ZL, 2					;Poner el puntero en el primer BCD
+000267 940e 0226 		call USART_ESPERA
+000269 91b1      		ld	r27, Z+					;Cargamos primer decimal
+00026a e3d0      		ldi r29, 48
+00026b 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+00026c 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
+00026e 940e 0226 		call USART_ESPERA
                  
-000236 9508      		ret
+000270 940e 0226 		call USART_ESPERA
+000272 91b1      		ld	r27, Z+					;Cargamos segundo decimal
+000273 e3d0      		ldi r29, 48
+000274 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+000275 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
+000277 940e 0226 		call USART_ESPERA
+                 	
+000279 940e 0226 		call USART_ESPERA
+00027b 81b0      		ld	r27, Z					;Cargamos tercer decimal
+00027c e3d0      		ldi r29, 48
+00027d 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+00027e 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
+000280 940e 0226 		call USART_ESPERA
                  
+000282 9734      		SBIW ZL, 4					;Poner el puntero en el primer BCD
+000283 9508      		ret
+                 		
                  ;########################################################## USART COMPARACION #########################################################
                  
                  	USART_COMPARACION:
                  		
-000237 9100 0113 		lds r16, DATO_RX			;Cargar dato recibido
-000239 e516      		ldi r17, 0x56				;Comparar con V
-00023a 1301      		cpse r16, r17
-00023b c002      		rjmp I						;Si es falso, compara con I
-00023c 940e 0156 		call MOSTRAR_TENSION		
+000284 9100 0111 		lds r16, DATO_RX			;Cargar dato recibido
+000286 e516      		ldi r17, 0x56				;Comparar con V
+000287 1301      		cpse r16, r17
+000288 c002      		rjmp I						;Si es falso, compara con I
+000289 940e 01ba 		call MOSTRAR_TENSION		
                  		I:
-00023e e419      		ldi r17, 0x49				;Comparar con I
-00023f 1301      		cpse r16, r17
-000240 c002      		rjmp P						;Si es falso, compara con P
-000241 940e 0155 		call MOSTRAR_CORRIENTE
+00028b e419      		ldi r17, 0x49				;Comparar con I
+00028c 1301      		cpse r16, r17
+00028d c002      		rjmp P						;Si es falso, compara con P
+00028e 940e 0172 		call MOSTRAR_CORRIENTE
                  		P:
-000243 e510      		ldi r17, 0x50				;Comparar con P
-000244 1301      		cpse r16, r17
-000245 9508      		ret
-000246 940e 0154 		call MOSTRAR_POTENCIA
-000248 9508      		ret
+000290 e510      		ldi r17, 0x50				;Comparar con P
+000291 1301      		cpse r16, r17
+000292 9508      		ret
+000293 940e 0171 		call MOSTRAR_POTENCIA
+000295 9508      		ret
 
 
 RESOURCE USE INFORMATION
@@ -1719,39 +1760,39 @@ counted separately from r26..r31 here.
 
 "ATmega328P" register use summary:
 r0 :   7 r1 :   4 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
-r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   4 r13:  21 r14:  13 r15:  14 
-r16:  62 r17:  25 r18:  23 r19:  12 r20:  42 r21:  23 r22:  21 r23:  35 
-r24:  11 r25:  11 r26:   8 r27:  21 r28:   3 r29:  10 r30:   3 r31:   1 
-x  :   0 y  :   4 z  :   4 
-Registers used: 24 out of 35 (68.6%)
+r8 :   0 r9 :   0 r10:   0 r11:   0 r12:  11 r13:  22 r14:  11 r15:  12 
+r16:  63 r17:  30 r18:  26 r19:  15 r20:  68 r21:  23 r22:  21 r23:  34 
+r24:   8 r25:   8 r26:   8 r27:  21 r28:   0 r29:  10 r30:   3 r31:   1 
+x  :   0 y  :   0 z  :   7 
+Registers used: 22 out of 35 (62.9%)
 
 "ATmega328P" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   4 add   :  11 adiw  :   0 and   :   0 
+.lds  :   0 .sts  :   0 adc   :   5 add   :  12 adiw  :   0 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   1 brcs  :   4 break :   0 breq  :   0 brge  :   0 brhc  :   0 
+brcc  :   1 brcs  :   2 break :   0 breq  :   0 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
-brne  :   3 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :  40 cbi   :   0 cbr   :   0 
-clc   :   1 clh   :   0 cli   :   0 cln   :   0 clr   :   5 cls   :   0 
-clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   4 cpc   :   0 
+brne  :   2 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  :  55 cbi   :   0 cbr   :   0 
+clc   :   1 clh   :   0 cli   :   0 cln   :   0 clr   :   4 cls   :   0 
+clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   2 cpc   :   0 
 cpi   :   0 cpse  :   3 dec   :   1 eor   :   0 fmul  :   0 fmuls :   0 
-fmulsu:   0 icall :   0 ijmp  :   0 in    :   3 inc   :   2 jmp   :   5 
-ld    :   5 ldd   :   0 ldi   :  63 lds   :  23 lpm   :   0 lsl   :   0 
+fmulsu:   0 icall :   0 ijmp  :   0 in    :   3 inc   :   1 jmp   :   5 
+ld    :   5 ldd   :   0 ldi   :  79 lds   :  29 lpm   :   0 lsl   :   0 
 lsr   :   0 mov   :   9 movw  :   2 mul   :   7 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   9 pop   :  48 
-push  :  48 rcall :   4 ret   :  19 reti  :   4 rjmp  :   9 rol   :   4 
-ror   :   0 sbc   :   3 sbci  :   0 sbi   :   0 sbic  :   3 sbis  :   0 
-sbiw  :   4 sbr   :   0 sbrc  :   2 sbrs  :   1 sec   :   1 seh   :   0 
+neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   9 pop   :  51 
+push  :  51 rcall :   4 ret   :  17 reti  :   4 rjmp  :   8 rol   :   4 
+ror   :   0 sbc   :   2 sbci  :   0 sbi   :   0 sbic  :   3 sbis  :   0 
+sbiw  :   2 sbr   :   0 sbrc  :   2 sbrs  :   1 sec   :   1 seh   :   0 
 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
-sez   :   0 sleep :   0 spm   :   0 st    :   3 std   :   0 sts   :  55 
-sub   :   4 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
+sez   :   0 sleep :   0 spm   :   0 st    :   2 std   :   0 sts   :  68 
+sub   :   3 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
 Instructions used: 38 out of 113 (33.6%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000492   1082      0   1082   32768   3.3%
-[.dseg] 0x000100 0x000120      0     20     20    2048   1.0%
+[.cseg] 0x000000 0x00052c   1236      0   1236   32768   3.8%
+[.dseg] 0x000100 0x000114      0     20     20    2048   1.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 
 Assembly complete, 0 errors, 0 warnings
