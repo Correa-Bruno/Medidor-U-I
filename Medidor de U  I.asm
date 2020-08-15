@@ -82,6 +82,10 @@
 	DATO_RX: .Byte 1
 	GRANDEH: .Byte 1
 	GRANDEL: .Byte 1
+	Temp1: .Byte 1
+	Temp2: .Byte 1
+	Temp3: .Byte 1
+
 
 ;########################################################## VECTORES DE INTERRUPCION #########################################################
 
@@ -323,11 +327,81 @@
  
 	CALCULO_POTENCIA:
 
-		lds r23, TensionH
-		lds r22, TensionL
-		lds r21, CorrienteH
-		lds r20, CorrienteL
-		call mul16x16_16					;Llama funcion multiplicacion
+		lds r23, CorrienteH					;Cargar valor de corriente
+		lds r22, CorrienteL
+		lds DividendoH, TensionH			;Cargar valor de tension
+		lds DividendoL, TensionL
+		ldi DivisorH, 0x03					;Cargar 1000 en divisor
+		ldi DivisorL, 0xE8
+		call Division16_16					;Llamar funcion division
+		sts GRANDEH, r17					;Guardar resultado
+		sts GRANDEL, r16
+
+		mov DividendoH, RestoH				;Cargar resto para dividir
+		mov DividendoL, RestoL
+		ldi DivisorH, 0x00					;Cargar 100 en divisor
+		ldi DivisorL, 0x64
+		call Division16_16					;Llamar funcion division		
+		sts Temp1, r16						;Guardar resultado (primer decimal)
+
+		mov DividendoH, RestoH				;Cargar resto para dividir
+		mov DividendoL, RestoL
+		ldi DivisorH, 0x00					;Cargar 10 en divisor
+		ldi DivisorL, 0x0A
+		call Division16_16					;Llamar funcion division
+		sts Temp2, r16						;Guardar resultado (segundo decimal)
+		sts Temp3, RestoL					;Guardar resto (tercer decimal)
+
+		lds r21, GRANDEH
+		lds r20, GRANDEL
+		call mul16x16_16					;Llamar funcion multiplicacion
+		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+		sts PotenciaL, r16
+
+		lds r23, CorrienteH					;Cargar valor de corriente
+		lds r22, CorrienteL
+		ldi r21, 0x00						;Cargar valor del primer decimal
+		lds r20, Temp1
+		call mul16x16_16					;Llamar funcion multiplicacion
+		ldi DivisorH, 0x00					;Cargar 10 en divisor para acomodar numero
+		ldi DivisorL, 0x0A
+		call Division16_16					;Llamar funcion division		
+		lds r19, PotenciaH					;Cargar valor temporal de potencia
+		lds r18, PotenciaL
+		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
+		adc r16, r18
+		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+		sts PotenciaL, r16
+
+		lds r23, CorrienteH					;Cargar valor de corriente
+		lds r22, CorrienteL
+		ldi r21, 0x00						;Cargar valor del segundo decimal
+		lds r20, Temp2
+		call mul16x16_16					;Llamar funcion multiplicacion
+		ldi DivisorH, 0x00					;Cargar 100 en divisor para acomodar numero
+		ldi DivisorL, 0x64
+		call Division16_16					;Llamar funcion division		
+		lds r19, PotenciaH					;Cargar valor temporal de potencia
+		lds r18, PotenciaL
+		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
+		adc r16, r18
+		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+		sts PotenciaL, r16
+
+		lds r23, CorrienteH					;Cargar valor de corriente
+		lds r22, CorrienteL
+		ldi r21, 0x00						;Cargar valor del segundo decimal
+		lds r20, Temp3
+		call mul16x16_16					;Llamar funcion multiplicacion
+		ldi DivisorH, 0x03					;Cargar 1000 en divisor para acomodar numero
+		ldi DivisorL, 0xE8
+		call Division16_16					;Llamar funcion division		
+		lds r19, PotenciaH					;Cargar valor temporal de potencia
+		lds r18, PotenciaL
+		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
+		adc r16, r18
+		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+		sts PotenciaL, r16
 
 		ret
 		
@@ -394,9 +468,61 @@
 ;########################################################## MOSTRAR POTENCIA #########################################################
 
 	MOSTRAR_POTENCIA:
-
 		
+		lds ENTEROH, PotenciaH		;Cargar valor de potencia alta
+		lds ENTEROL, PotenciaL		;Cargar valor de potencia baja
+		
+		call DESCOMPOSICION
+				
+		call USART_ESPERA			
+		ldi r20, 0x50				; P
+		sts UDR0, r20
 
+		call USART_ESPERA
+		ldi r20, 0x20				; (espacio)
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x3D				; =
+		sts UDR0, r20
+
+		call USART_ESPERA
+		ldi r20, 0x20				; (espacio)
+		sts UDR0, r20
+
+		call MOSTRAR
+
+		call USART_ESPERA
+		ldi r20, 0x20				; (espacio)
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x57				; W
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x61				; a
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x74				; t
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x74				; t
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x0A				; (salto de linea)
+		sts UDR0, r20
+
+		call USART_ESPERA			
+		ldi r20, 0x0D				; (retorno de carro)
+		sts UDR0, r20
+
+		clr r17						;Limpiar registro de dato recibido
+		sts DATO_RX, r17
+	
 		ret
 
 ;######################################################### MOSTRAR CORRIENTE #########################################################

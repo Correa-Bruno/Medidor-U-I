@@ -1,17 +1,17 @@
 <ASSEMBLER_INFO>
  <VERSION>2.1.57</VERSION>
  <DEVICE>"ATmega328P"</DEVICE>
- <WORKING_DIR>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Debug</WORKING_DIR>
+ <WORKING_DIR>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Debug</WORKING_DIR>
  <INCLUDE_PATH>
   <DIR>C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include</DIR>
   <DIR></DIR>
  </INCLUDE_PATH>
- <SOURCE_FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</SOURCE_FILE>
+ <SOURCE_FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</SOURCE_FILE>
  <INCLUDED_FILES>
   <FILE>C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include\m328Pdef.inc</FILE>
  </INCLUDED_FILES>
  <OBJECT_FILES>
-  <FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Debug/Medidor de U  I.obj</FILE>
+  <FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Debug/Medidor de U  I.obj</FILE>
  </OBJECT_FILES>
  <HEX_FILES>
   <FILE>Medidor de U  I.hex</FILE>
@@ -21,52 +21,55 @@
   <FILE>Medidor de U  I.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <VAL_TensionADCH><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>69</LINE></VAL_TensionADCH>
-  <VAL_TensionADCL><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>70</LINE></VAL_TensionADCL>
-  <VAL_CorrienteADCH><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>71</LINE></VAL_CorrienteADCH>
-  <VAL_CorrienteADCL><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>72</LINE></VAL_CorrienteADCL>
-  <TensionH><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>73</LINE></TensionH>
-  <TensionL><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>74</LINE></TensionL>
-  <PotenciaH><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>75</LINE></PotenciaH>
-  <PotenciaL><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>76</LINE></PotenciaL>
-  <CorrienteH><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>77</LINE></CorrienteH>
-  <CorrienteL><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>78</LINE></CorrienteL>
-  <RestodivL><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>79</LINE></RestodivL>
-  <RestodivH><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>80</LINE></RestodivH>
-  <VECTOR><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>81</LINE></VECTOR>
-  <DATO_RX><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>82</LINE></DATO_RX>
-  <GRANDEH><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>83</LINE></GRANDEH>
-  <GRANDEL><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>84</LINE></GRANDEL>
-  <INICIO><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>108</LINE></INICIO>
-  <RTI_SELECT><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>202</LINE></RTI_SELECT>
-  <RTI_TIMER1_OVF><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>184</LINE></RTI_TIMER1_OVF>
-  <USART_RXC><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>527</LINE></USART_RXC>
-  <BUCLE><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>174</LINE></BUCLE>
-  <ADC0><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>217</LINE></ADC0>
-  <ADC1><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>244</LINE></ADC1>
-  <CALCULO_TENSION><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>270</LINE></CALCULO_TENSION>
-  <CALCULO_CORRIENTE><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>301</LINE></CALCULO_CORRIENTE>
-  <USART_COMPARACION><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>642</LINE></USART_COMPARACION>
-  <MOSTRAR_POTENCIA><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>396</LINE></MOSTRAR_POTENCIA>
-  <MOSTRAR_CORRIENTE><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>404</LINE></MOSTRAR_CORRIENTE>
-  <MOSTRAR_TENSION><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>468</LINE></MOSTRAR_TENSION>
-  <adcLeerADC0><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>230</LINE></adcLeerADC0>
-  <adcLeerADC1><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>257</LINE></adcLeerADC1>
-  <mul16x16_16><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>336</LINE></mul16x16_16>
-  <Division16_16><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>366</LINE></Division16_16>
-  <CALCULO_POTENCIA><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>324</LINE></CALCULO_POTENCIA>
-  <mul16x16_24><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>349</LINE></mul16x16_24>
-  <div_1><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>370</LINE></div_1>
-  <div_2><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>378</LINE></div_2>
-  <div_3><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>388</LINE></div_3>
-  <DESCOMPOSICION><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>546</LINE></DESCOMPOSICION>
-  <USART_ESPERA><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>537</LINE></USART_ESPERA>
-  <MOSTRAR><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>596</LINE></MOSTRAR>
-  <Bin2ToDigit><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>574</LINE></Bin2ToDigit>
-  <Bin2ToDigita><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>577</LINE></Bin2ToDigita>
-  <Bin2ToDigitc><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>590</LINE></Bin2ToDigitc>
-  <Bin2ToDigitb><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>584</LINE></Bin2ToDigitb>
-  <I><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>649</LINE></I>
-  <P><FILE>C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>654</LINE></P>
+  <VAL_TensionADCH><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>69</LINE></VAL_TensionADCH>
+  <VAL_TensionADCL><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>70</LINE></VAL_TensionADCL>
+  <VAL_CorrienteADCH><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>71</LINE></VAL_CorrienteADCH>
+  <VAL_CorrienteADCL><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>72</LINE></VAL_CorrienteADCL>
+  <TensionH><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>73</LINE></TensionH>
+  <TensionL><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>74</LINE></TensionL>
+  <PotenciaH><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>75</LINE></PotenciaH>
+  <PotenciaL><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>76</LINE></PotenciaL>
+  <CorrienteH><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>77</LINE></CorrienteH>
+  <CorrienteL><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>78</LINE></CorrienteL>
+  <RestodivL><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>79</LINE></RestodivL>
+  <RestodivH><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>80</LINE></RestodivH>
+  <VECTOR><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>81</LINE></VECTOR>
+  <DATO_RX><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>82</LINE></DATO_RX>
+  <GRANDEH><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>83</LINE></GRANDEH>
+  <GRANDEL><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>84</LINE></GRANDEL>
+  <Temp1><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>85</LINE></Temp1>
+  <Temp2><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>86</LINE></Temp2>
+  <Temp3><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>87</LINE></Temp3>
+  <INICIO><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>112</LINE></INICIO>
+  <RTI_SELECT><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>206</LINE></RTI_SELECT>
+  <RTI_TIMER1_OVF><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>188</LINE></RTI_TIMER1_OVF>
+  <USART_RXC><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>653</LINE></USART_RXC>
+  <BUCLE><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>178</LINE></BUCLE>
+  <ADC0><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>221</LINE></ADC0>
+  <ADC1><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>248</LINE></ADC1>
+  <CALCULO_TENSION><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>274</LINE></CALCULO_TENSION>
+  <CALCULO_CORRIENTE><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>305</LINE></CALCULO_CORRIENTE>
+  <USART_COMPARACION><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>768</LINE></USART_COMPARACION>
+  <MOSTRAR_POTENCIA><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>470</LINE></MOSTRAR_POTENCIA>
+  <MOSTRAR_CORRIENTE><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>530</LINE></MOSTRAR_CORRIENTE>
+  <MOSTRAR_TENSION><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>594</LINE></MOSTRAR_TENSION>
+  <adcLeerADC0><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>234</LINE></adcLeerADC0>
+  <adcLeerADC1><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>261</LINE></adcLeerADC1>
+  <mul16x16_16><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>410</LINE></mul16x16_16>
+  <Division16_16><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>440</LINE></Division16_16>
+  <CALCULO_POTENCIA><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>328</LINE></CALCULO_POTENCIA>
+  <mul16x16_24><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>423</LINE></mul16x16_24>
+  <div_1><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>444</LINE></div_1>
+  <div_2><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>452</LINE></div_2>
+  <div_3><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>462</LINE></div_3>
+  <DESCOMPOSICION><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>672</LINE></DESCOMPOSICION>
+  <USART_ESPERA><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>663</LINE></USART_ESPERA>
+  <MOSTRAR><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>722</LINE></MOSTRAR>
+  <Bin2ToDigit><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>700</LINE></Bin2ToDigit>
+  <Bin2ToDigita><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>703</LINE></Bin2ToDigita>
+  <Bin2ToDigitc><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>716</LINE></Bin2ToDigitc>
+  <Bin2ToDigitb><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>710</LINE></Bin2ToDigitb>
+  <I><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>775</LINE></I>
+  <P><FILE>C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm</FILE><LINE>780</LINE></P>
  </LABELS>
 </ASSEMBLER_INFO>
