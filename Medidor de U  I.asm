@@ -129,14 +129,12 @@
 		out PORTD, r16
 		ldi r16, (1<<PCIE2)								;habilito int por cambio de pines[7:0] (PCIE2)
 		sts PCICR, r16
-		ldi r16, 0b1110_0000							;habilito los 3 pines de interrupcion (PCINT 23 - 22 - 21)
+		ldi r16, 0b1110_0000							;habilito los pines 7-6-5 de interrupcion (PCINT 23 - 22 - 21)
 		sts PCMSK2, r16
 
-		ldi r16, (1<<PB1)|(1<<PB2)						;como salida PB1(OC1A) y PB2(OC1B) PWM
+		ldi r16, (1<<PB0)|(1<<PB1)|(1<<PB2)|(1<<PB5)|(1<<PB3)	;como salida PB1-9(OC1A), PB2-10(OC1B)|| PB5-13(CSK), PB3-11(MOSI), PB0-8(CS)
 		out DDRB, r16
 
-		ldi r16, (1<<PD5)|(1<<PD6)						;enciendo led prueba interrupcion externa PCEI0
-		out DDRD, r16
 
 ;########################################################## CONFIGURACION DE TIMER/COMP 1 #########################################################
 		
@@ -166,8 +164,18 @@
 			
 		ldi r16, (0<<USBS0)|(1<<UCSZ01)|(1<<UCSZ00)	;Stop Bit 1, 8 bits
 		sts UCSR0C, r16								
+
+;##########################################################  CONFIGURACION SPI Modo - MAESTRO ######################################################### 
 		
-		SEI
+		ldi r17,(1<<SPE)|(1<<MSTR)|(1<<SPR0)	; Habilitar SPI como Master, frecuencia SCK (1Mhz)
+		out SPCR,r17
+		
+		ldi r16, (1<<PORTB0)			;Configuramos pull up PB0 - pin 8 - CS (chip select)
+		out PORTB, r16
+		
+		call SPI_MasterInicio		;Subrutina para inicio de SPI
+
+		SEI							; Habilitacion global de interrupciones				
 
 ;################################################################################################################################## 
 ;############################################################# PROGRAMA ###########################################################
@@ -206,12 +214,12 @@
 		RTI_SELECT:
 			PUSH_SREG
 
-			sbic PIND, PIND7				;Pregunta si PD7 esta en 0
+			/*sbic PIND, PIND7				;Pregunta si PD7 esta en 0
 			call MOSTRAR_POTENCIA			;Llama funcion para mostrar potencia
 			sbic PIND, PIND6				;Pregunta si PD6 esta en 0
-			call MOSTRAR_CORRIENTE			;Llama funcion para mostrar corriente
+			call MOSTRAR_CORRIENTE	*/		;Llama funcion para mostrar corriente
 			sbic PIND, PIND5				;Pregunta si PD5 esta en 0
-			call MOSTRAR_TENSION			;Llama funcion para mostrar tension
+			call MOSTRAR_TENSION_MAX			;Llama funcion para mostrar tension
 			
 			POP_SREG
 			reti
@@ -782,4 +790,322 @@
 		cpse r16, r17
 		ret
 		call MOSTRAR_POTENCIA
+		ret
+;########################################################## INICIALIZAMOS DISPLAY #########################################################
+
+	SPI_MasterInicio:
+
+			;/////////////////////////////////////////// SETEAR BRILLO ////////////////////////////////////////////////////////
+					
+			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			nop										;Cumplir tcss de hoja de datos MAX
+			ldi r17, 0x0A
+			out SPDR, r17							;Entrar Set Brillo MAX
+			call Esperar_TX							;Empezar la TX de información
+			nop
+			ldi r17, 0x00
+			out SPDR,r17							;Seteamos el brillo MAX al Minimo
+			call Esperar_TX							;Empezar la TX de información
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+
+			;////////////////////////////////////// SETEAR MODOS ////////////////////////////////////////////////////////////
+
+			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			nop
+			ldi r17, 0x09
+			out SPDR, r17							;Modo decodificacion MAX7219
+			call Esperar_TX							;Empezar la TX de información
+			nop
+			ldi r17, 0x0F
+			out SPDR, r17							;Decodificar los digitos del 0 - 3
+			call Esperar_TX							;Empezar la TX de información
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+
+			;/////////////////////////////////////////// CANTIDAD DE DIGITOS /////////////////////////////////////////////////////////////////////
+
+			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			ldi r17, 0x0B
+			out SPDR,r17							;Set SCAN Limit
+			call Esperar_TX							;Empezar la TX de información
+			nop
+			ldi r17, 0x05
+			out SPDR,r17							;Mostrar 6 digitos
+			call Esperar_TX							;Empezar la TX de información
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+
+			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			ldi r17, 0x0C
+			out SPDR,r17							;Set de MODO
+			call Esperar_TX							;Modo Normal 
+			nop
+			ldi r17, 0x01
+			out SPDR,r17							;MODO Normal
+			call Esperar_TX							;Empezar la TX de información
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+
+			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			ldi r17, 0x0F
+			out SPDR,r17							;Menu Modo TEST
+			call Esperar_TX							;Modo normal (No TEST)
+			nop
+			nop
+			ldi r17, 0x00
+			out SPDR,r17							;Modo Operacion Normal
+			call Esperar_TX							;Empezar la TX de información
+			nop
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+
+			;////////////////////////////////INICIO DISPLAY TODOS LOS DIGITOS OFF //////////////////////////////////////////////////////////
+
+			/*ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			ldi r17, 0x01
+			out SPDR,r17							;Digit 0
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, 0x0F
+			out SPDR,r17							
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+			nop
+
+			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			ldi r17, 0x02
+			out SPDR,r17							;Digit1
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, 0x0F
+			out SPDR,r17							
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+			nop
+
+			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			ldi r17, 0x03
+			out SPDR,r17							;Digit 2
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, 0x0F
+			out SPDR,r17							
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+			nop
+
+			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			ldi r17, 0x04
+			out SPDR,r17							;Digit 3
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, 0x0F
+			out SPDR,r17							
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+			nop
+
+			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			ldi r17, 0x05
+			out SPDR,r17							;Digit 4
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, 0x00
+			out SPDR,r17							
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+			nop
+
+			ldi r17, (0<<PORTB0)					;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			ldi r17, 0x06
+			out SPDR,r17							;Digit 5
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, 0x00
+			out SPDR,r17							
+			call Esperar_TX							
+			nop
+			nop
+			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+			out PORTB, r17
+			nop
+			nop*/
+
+			ret
+
+	Esperar_TX:	
+			in r26, SPSR		
+			sbrs r26, SPIF							; Esperar que se complete la transmisión
+			rjmp Esperar_TX
+			
+			ret
+
+	MOSTRAR_TENSION_MAX:
+			
+			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			nop
+			ldi r17, 0x06
+			out SPDR, r17							;Digito 6
+			call Esperar_TX							;Empezar la TX de información
+			nop
+
+			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			nop
+			ldi r17, 0b0011_1110			;Enviamos letra "U"
+			out SPDR, r17						
+			call Esperar_TX							;Empezar la TX de información
+			nop
+
+			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			nop
+			ldi r17, 0x05
+			out SPDR, r17							;Digito 5
+			call Esperar_TX							;Empezar la TX de información
+			nop
+
+			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+			out PORTB, r17
+			nop
+			ldi r17, 0b0000_1001			;Enviamos signo "="
+			out SPDR, r17						
+			call Esperar_TX							;Empezar la TX de información
+			nop
+
+			call DESCOMPOSICION
+			call TRANSMITIR_MAX
+
+	TRANSMITIR_MAX:
+			
+		; parte alta decimal
+
+		ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+		out PORTB, r17
+		nop
+		ldi r17, 0x04
+		out SPDR, r17							;Digito entero alto
+		call Esperar_TX							;Empezar la TX de información
+		nop
+
+		ld	r17, Z+								; Decena de mil
+
+		out SPDR, r17							;Envio digito entero alto
+		call Esperar_TX							;Empezar la TX de información
+		nop
+		ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+		out PORTB, r17
+		nop
+
+		;entero bajo
+
+		ldi r17, (0<<PORTB0)				;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTB, r17
+		nop
+		ldi r17, 0x03
+		out SPDR, r17							;Digito Unidad de MIl
+		call Esperar_TX							;Empezar la TX de información
+		nop
+	
+		ld	r17, Z+								; Unidad de MIl
+		ldi r16, 0xF0
+		add r17, r16							; suma para mostrar puntto decima
+		out SPDR, r17							;Envio Unidad de Mil
+		call Esperar_TX							;Empezar la TX de información
+		nop
+		ldi r17, (1<<PORTB0)						;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTB, r17
+		nop
+
+
+		; primer decimal
+
+		ldi r17, (0<<PORTB0)				;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTB, r17
+		nop
+		ldi r17, 0x02
+		out SPDR, r17							;Digito Centena
+		call Esperar_TX							;Empezar la TX de información
+		nop
+
+		ld	r17, Z+								; primer decimal
+
+		out SPDR, r17							;Envio Centena
+		call Esperar_TX							;Empezar la TX de información
+		nop
+		ldi r17, (1<<PORTB0)				;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTB, r17
+		nop
+
+		; ultimo decimal
+
+		ldi r17, (0<<PORTB0)				;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTB, r17
+		nop
+		ldi r17, 0x1
+		out SPDR, r17							;Digito Decena
+		call Esperar_TX							;Empezar la TX de información
+		nop
+
+		ld	r17, Z+; Decena
+
+		out SPDR, r17							;Envio Decena
+		call Esperar_TX							;Empezar la TX de información
+		nop
+		ldi r17, (1<<PORTB0)				;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTB, r17
+		nop
+		
+		SBIW ZL, 4
+		clr r17
+
 		ret

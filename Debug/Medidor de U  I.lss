@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm Sat Aug 15 00:43:45 2020
+AVRASM ver. 2.1.57  C:\Users\matias gonzalo\Desktop\multimedidor de tension\Medidor de U  I.asm Wed Aug 19 17:55:30 2020
 
 [builtin](2): Including file 'C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include\m328Pdef.inc'
                  
@@ -1077,13 +1077,13 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
 000000 940c 0035 	jmp INICIO
                  
                  .ORG 0x000A
-00000a 940c 00aa 	jmp RTI_SELECT
+00000a 940c 00ae 	jmp RTI_SELECT
                  	
                  .ORG 0x001A
-00001a 940c 0075 	jmp RTI_TIMER1_OVF
+00001a 940c 0079 	jmp RTI_TIMER1_OVF
                  
                  .ORG 0x0024
-000024 940c 02a6 	jmp USART_RXC
+000024 940c 02a4 	jmp USART_RXC
                  
                  .ORG 0x34
 000034 9518      	reti
@@ -1112,45 +1112,53 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
 00003f b90b      		out PORTD, r16
 000040 e004      		ldi r16, (1<<PCIE2)								;habilito int por cambio de pines[7:0] (PCIE2)
 000041 9300 0068 		sts PCICR, r16
-000043 ee00      		ldi r16, 0b1110_0000							;habilito los 3 pines de interrupcion (PCINT 23 - 22 - 21)
+000043 ee00      		ldi r16, 0b1110_0000							;habilito los pines 7-6-5 de interrupcion (PCINT 23 - 22 - 21)
 000044 9300 006d 		sts PCMSK2, r16
                  
-000046 e006      		ldi r16, (1<<PB1)|(1<<PB2)						;como salida PB1(OC1A) y PB2(OC1B) PWM
+000046 e20f      		ldi r16, (1<<PB0)|(1<<PB1)|(1<<PB2)|(1<<PB5)|(1<<PB3)	;como salida PB1-9(OC1A), PB2-10(OC1B)|| PB5-13(CSK), PB3-11(MOSI), PB0-8(CS)
 000047 b904      		out DDRB, r16
                  
-000048 e600      		ldi r16, (1<<PD5)|(1<<PD6)						;enciendo led prueba interrupcion externa PCEI0
-000049 b90a      		out DDRD, r16
                  
                  ;########################################################## CONFIGURACION DE TIMER/COMP 1 #########################################################
                  		
-00004a ea03      		ldi r16, (1<<COM1A1)|(0<<COM1A0)|(1<<COM1B1)|(0<<COM1B0)|(1<<WGM11)|(1<<WGM10) ; modo fase correcta PWM, comparacion igual no invertido, resolucion 10-bit
-00004b 9300 0080 		sts TCCR1A, r16
-00004d e00a      		ldi r16, (1<<WGM12)|(0<<WGM13)|(0<<CS12)|(1<<CS11)|(0<<CS10)  ;selector de reloj de timer/counter: Clock_I-O/8(from prescaler)
-00004e 9300 0081 		sts TCCR1B, r16
+000048 ea03      		ldi r16, (1<<COM1A1)|(0<<COM1A0)|(1<<COM1B1)|(0<<COM1B0)|(1<<WGM11)|(1<<WGM10) ; modo fase correcta PWM, comparacion igual no invertido, resolucion 10-bit
+000049 9300 0080 		sts TCCR1A, r16
+00004b e00a      		ldi r16, (1<<WGM12)|(0<<WGM13)|(0<<CS12)|(1<<CS11)|(0<<CS10)  ;selector de reloj de timer/counter: Clock_I-O/8(from prescaler)
+00004c 9300 0081 		sts TCCR1B, r16
                  
-000050 e001      		ldi r16, (1<<TOIE1)								;interrupcion de salida del temporizador/contador  
-000051 9300 006f 		sts TIMSK1, r16
+00004e e001      		ldi r16, (1<<TOIE1)								;interrupcion de salida del temporizador/contador  
+00004f 9300 006f 		sts TIMSK1, r16
                  		
-000053 e000      		ldi r16, 0x00
-000054 9300 0089 		sts OCR1AH, r16
-000056 9300 0088 		sts OCR1AL, r16
-000058 9300 008b 		sts OCR1BH, r16
-00005a 9300 008a 		sts OCR1BL, r16
+000051 e000      		ldi r16, 0x00
+000052 9300 0089 		sts OCR1AH, r16
+000054 9300 0088 		sts OCR1AL, r16
+000056 9300 008b 		sts OCR1BH, r16
+000058 9300 008a 		sts OCR1BL, r16
                  
                  ;########################################################## CONFIGURACION DE USART #########################################################
                  
-00005c e607      		ldi r16, 103								;Velocidad de transmicion 9600 Bd
-00005d e010      		ldi r17, 0
-00005e 9310 00c5 		sts UBRR0H, r17
-000060 9300 00c4 		sts UBRR0L, r16
+00005a e607      		ldi r16, 103								;Velocidad de transmicion 9600 Bd
+00005b e010      		ldi r17, 0
+00005c 9310 00c5 		sts UBRR0H, r17
+00005e 9300 00c4 		sts UBRR0L, r16
                  
-000062 e908      		ldi r16, (1<<RXCIE0)|(1<<RXEN0)|(1<<TXEN0)	;Habilita interrupción por recepción, Habilita recepción, Habilita transmición
-000063 9300 00c1 		sts UCSR0B, r16
+000060 e908      		ldi r16, (1<<RXCIE0)|(1<<RXEN0)|(1<<TXEN0)	;Habilita interrupción por recepción, Habilita recepción, Habilita transmición
+000061 9300 00c1 		sts UCSR0B, r16
                  			
-000065 e006      		ldi r16, (0<<USBS0)|(1<<UCSZ01)|(1<<UCSZ00)	;Stop Bit 1, 8 bits
-000066 9300 00c2 		sts UCSR0C, r16								
+000063 e006      		ldi r16, (0<<USBS0)|(1<<UCSZ01)|(1<<UCSZ00)	;Stop Bit 1, 8 bits
+000064 9300 00c2 		sts UCSR0C, r16								
+                 
+                 ;##########################################################  CONFIGURACION SPI Modo - MAESTRO ######################################################### 
                  		
-000068 9478      		SEI
+000066 e511      		ldi r17,(1<<SPE)|(1<<MSTR)|(1<<SPR0)	; Habilitar SPI como Master, frecuencia SCK (1Mhz)
+000067 bd1c      		out SPCR,r17
+                 		
+000068 e001      		ldi r16, (1<<PORTB0)			;Configuramos pull up PB0 - pin 8 - CS (chip select)
+000069 b905      		out PORTB, r16
+                 		
+00006a 940e 033d 		call SPI_MasterInicio		;Subrutina para inicio de SPI
+                 
+00006c 9478      		SEI							; Habilitacion global de interrupciones				
                  
                  ;################################################################################################################################## 
                  ;############################################################# PROGRAMA ###########################################################
@@ -1159,360 +1167,360 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
                  ;########################################################## BUCLE PRINCIPAL #########################################################
                  		
                  		BUCLE:
-000069 940e 00d8 			call ADC0
-00006b 940e 00ee 			call ADC1
-00006d 940e 0104 			call CALCULO_TENSION
-00006f 940e 0127 			call CALCULO_CORRIENTE
-000071 940e 032d 			call USART_COMPARACION
-000073 940c 0069 			jmp BUCLE
+00006d 940e 00d6 			call ADC0
+00006f 940e 00ec 			call ADC1
+000071 940e 0102 			call CALCULO_TENSION
+000073 940e 0125 			call CALCULO_CORRIENTE
+000075 940e 032b 			call USART_COMPARACION
+000077 940c 006d 			jmp BUCLE
                  
                  ;########################################################## TRATAMIENTO DE INTERRUPCION DEL TIMER1 (salidas PWM 1-5 V) #########################################################
                  
                  		RTI_TIMER1_OVF:			
-000075 92df
-000076 b6df
-000077 92df
-000078 92cf
-000079 92ef
-00007a 92ff
-00007b 930f
-00007c 931f
-00007d 932f
-00007e 933f
-00007f 934f
-000080 935f
-000081 936f
-000082 937f
-000083 938f
-000084 939f
-000085 93af
-000086 93bf      			PUSH_SREG						;guardo en la pila la posicion de memoria
+000079 92df
+00007a b6df
+00007b 92df
+00007c 92cf
+00007d 92ef
+00007e 92ff
+00007f 930f
+000080 931f
+000081 932f
+000082 933f
+000083 934f
+000084 935f
+000085 936f
+000086 937f
+000087 938f
+000088 939f
+000089 93af
+00008a 93bf      			PUSH_SREG						;guardo en la pila la posicion de memoria
                  								
-000087 9150 0100 			lds r21, VAL_TensionADCH
-000089 9350 0089 			sts OCR1AH, r21					;salida PWMA timer OC1A
-00008b 9150 0101 			lds r21, VAL_TensionADCL	
-00008d 9350 0088 			sts OCR1AL, r21
+00008b 9150 0100 			lds r21, VAL_TensionADCH
+00008d 9350 0089 			sts OCR1AH, r21					;salida PWMA timer OC1A
+00008f 9150 0101 			lds r21, VAL_TensionADCL	
+000091 9350 0088 			sts OCR1AL, r21
                  			
-00008f 9140 0102 			lds r20, VAL_CorrienteADCH
-000091 9340 008b 			sts OCR1BH, r20					;salida PWMB timer OC1B
-000093 9140 0103 			lds r20, VAL_CorrienteADCL	
-000095 9340 008a 			sts OCR1BL, r20
+000093 9140 0102 			lds r20, VAL_CorrienteADCH
+000095 9340 008b 			sts OCR1BH, r20					;salida PWMB timer OC1B
+000097 9140 0103 			lds r20, VAL_CorrienteADCL	
+000099 9340 008a 			sts OCR1BL, r20
                  			
-000097 91bf
-000098 91af
-000099 919f
-00009a 918f
-00009b 917f
-00009c 916f
-00009d 915f
-00009e 914f
-00009f 913f
-0000a0 912f
-0000a1 911f
-0000a2 910f
-0000a3 90ff
-0000a4 90ef
-0000a5 90cf
-0000a6 90df
-0000a7 bedf
-0000a8 90df      			POP_SREG					;recupero el valor de la pila
-0000a9 9518      			reti
+00009b 91bf
+00009c 91af
+00009d 919f
+00009e 918f
+00009f 917f
+0000a0 916f
+0000a1 915f
+0000a2 914f
+0000a3 913f
+0000a4 912f
+0000a5 911f
+0000a6 910f
+0000a7 90ff
+0000a8 90ef
+0000a9 90cf
+0000aa 90df
+0000ab bedf
+0000ac 90df      			POP_SREG					;recupero el valor de la pila
+0000ad 9518      			reti
                  
                  ;########################################################## INTERRUPCION POR PCINT0 #########################################################
                  
                  		RTI_SELECT:
-0000aa 92df
-0000ab b6df
-0000ac 92df
-0000ad 92cf
-0000ae 92ef
-0000af 92ff
-0000b0 930f
-0000b1 931f
-0000b2 932f
-0000b3 933f
-0000b4 934f
-0000b5 935f
-0000b6 936f
-0000b7 937f
-0000b8 938f
-0000b9 939f
-0000ba 93af
-0000bb 93bf      			PUSH_SREG
+0000ae 92df
+0000af b6df
+0000b0 92df
+0000b1 92cf
+0000b2 92ef
+0000b3 92ff
+0000b4 930f
+0000b5 931f
+0000b6 932f
+0000b7 933f
+0000b8 934f
+0000b9 935f
+0000ba 936f
+0000bb 937f
+0000bc 938f
+0000bd 939f
+0000be 93af
+0000bf 93bf      			PUSH_SREG
                  
-0000bc 994f      			sbic PIND, PIND7				;Pregunta si PD7 esta en 0
-0000bd 940e 01d8 			call MOSTRAR_POTENCIA			;Llama funcion para mostrar potencia
-0000bf 994e      			sbic PIND, PIND6				;Pregunta si PD6 esta en 0
-0000c0 940e 021b 			call MOSTRAR_CORRIENTE			;Llama funcion para mostrar corriente
-0000c2 994d      			sbic PIND, PIND5				;Pregunta si PD5 esta en 0
-0000c3 940e 0263 			call MOSTRAR_TENSION			;Llama funcion para mostrar tension
+                 			/*sbic PIND, PIND7				;Pregunta si PD7 esta en 0
+                 			call MOSTRAR_POTENCIA			;Llama funcion para mostrar potencia
+                 			sbic PIND, PIND6				;Pregunta si PD6 esta en 0
+                 			call MOSTRAR_CORRIENTE	*/		;Llama funcion para mostrar corriente
+0000c0 994d      			sbic PIND, PIND5				;Pregunta si PD5 esta en 0
+0000c1 940e 0391 			call MOSTRAR_TENSION_MAX			;Llama funcion para mostrar tension
                  			
-0000c5 91bf
-0000c6 91af
-0000c7 919f
-0000c8 918f
-0000c9 917f
-0000ca 916f
-0000cb 915f
-0000cc 914f
-0000cd 913f
-0000ce 912f
-0000cf 911f
-0000d0 910f
-0000d1 90ff
-0000d2 90ef
-0000d3 90cf
-0000d4 90df
-0000d5 bedf
-0000d6 90df      			POP_SREG
-0000d7 9518      			reti
+0000c3 91bf
+0000c4 91af
+0000c5 919f
+0000c6 918f
+0000c7 917f
+0000c8 916f
+0000c9 915f
+0000ca 914f
+0000cb 913f
+0000cc 912f
+0000cd 911f
+0000ce 910f
+0000cf 90ff
+0000d0 90ef
+0000d1 90cf
+0000d2 90df
+0000d3 bedf
+0000d4 90df      			POP_SREG
+0000d5 9518      			reti
                  
                  ;########################################################## SUBRUTINA PARA LEER ADC0 ###################################################################
                  	
                  	ADC0:
                  
                  			// *** Configuramos ADMUX ***
-0000d8 e400      		ldi r16, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(0<<MUX0) 
-0000d9 9300 007c 		sts ADMUX, r16  
+0000d6 e400      		ldi r16, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(0<<MUX0) 
+0000d7 9300 007c 		sts ADMUX, r16  
                  			; Referencia de Voltaje Con AVCC y Capacitor. Activamos ADC, Canal ADC0    
                  
                  		// *** Iniciamos conversión en ADC0 *** 
-0000db ee0f      		ldi r16, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
-0000dc 9300 007a 		sts ADCSRA, r16 
-0000de e006      		ldi r16, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
-0000df 9300 007b 		sts ADCSRB, r16
+0000d9 ee0f      		ldi r16, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
+0000da 9300 007a 		sts ADCSRA, r16 
+0000dc e006      		ldi r16, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
+0000dd 9300 007b 		sts ADCSRB, r16
                  
                  		adcLeerADC0:
-0000e1 9100 007a 		lds r16, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
-0000e3 fd06      		SBRC r16, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
-0000e4 cffc      		rjmp adcLeerADC0 
+0000df 9100 007a 		lds r16, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
+0000e1 fd06      		SBRC r16, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
+0000e2 cffc      		rjmp adcLeerADC0 
                  			
-0000e5 9110 0078 		lds r17, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
-0000e7 9100 0079 		lds r16, ADCH  ; Cargamos parte alta del ADC en el registro 16.
-0000e9 9310 0103 		sts VAL_CorrienteADCL, r17 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
-0000eb 9300 0102 		sts VAL_CorrienteADCH, r16
+0000e3 9110 0078 		lds r17, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
+0000e5 9100 0079 		lds r16, ADCH  ; Cargamos parte alta del ADC en el registro 16.
+0000e7 9310 0103 		sts VAL_CorrienteADCL, r17 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
+0000e9 9300 0102 		sts VAL_CorrienteADCH, r16
                  	
-0000ed 9508      		ret
+0000eb 9508      		ret
                  			
                  ;################################################################### SUBRUTINA PARA LEER ADC1 ###################################################################
                  
                  	ADC1:
                  
                  			// *** Configuramos ADMUX ***
-0000ee e421      		ldi r18, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(1<<MUX0) 
-0000ef 9320 007c 		sts ADMUX, r18  
+0000ec e421      		ldi r18, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(1<<MUX0) 
+0000ed 9320 007c 		sts ADMUX, r18  
                  			; Referencia de Voltaje Con AVCC y Capacitor. Activamos ADC, Canal ADC0    
                  
                  		// *** Iniciamos conversión en ADC0 *** 
-0000f1 ee2f      		ldi r18, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
-0000f2 9320 007a 		sts ADCSRA, r18 
-0000f4 e026      		ldi r18, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
-0000f5 9320 007b 		sts ADCSRB, r18
+0000ef ee2f      		ldi r18, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
+0000f0 9320 007a 		sts ADCSRA, r18 
+0000f2 e026      		ldi r18, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
+0000f3 9320 007b 		sts ADCSRB, r18
                  
                  		adcLeerADC1:
-0000f7 9120 007a 		lds r18, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
-0000f9 fd26      		SBRC r18, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
-0000fa cffc      		rjmp adcLeerADC1 
+0000f5 9120 007a 		lds r18, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
+0000f7 fd26      		SBRC r18, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
+0000f8 cffc      		rjmp adcLeerADC1 
                  			
-0000fb 9120 0078 		lds r18, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
-0000fd 9130 0079 		lds r19, ADCH  ; Cargamos parte alta del ADC en el registro 16.
-0000ff 9320 0101 		sts VAL_TensionADCL, r18 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
-000101 9330 0100 		sts VAL_TensionADCH, r19
+0000f9 9120 0078 		lds r18, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
+0000fb 9130 0079 		lds r19, ADCH  ; Cargamos parte alta del ADC en el registro 16.
+0000fd 9320 0101 		sts VAL_TensionADCL, r18 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
+0000ff 9330 0100 		sts VAL_TensionADCH, r19
                  	
-000103 9508      		ret	
+000101 9508      		ret	
                  ;################################################################### CALCULO DE TENSION ###################################################################
                  	
                  	CALCULO_TENSION:
                  		
-000104 9170 0100 		lds R23, VAL_TensionADCH
-000106 9160 0101 		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
-000108 e050      		ldi R21,0x00
-000109 e148      		ldi R20,0x18						;Carga el numero 24 r21:r20
-00010a 940e 01af 		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
-00010c 9310 0112 		sts GRANDEH, r17					;Guardamos resultado de la primer multiplicacion
-00010e 9300 0113 		sts GRANDEL, r16
+000102 9170 0100 		lds R23, VAL_TensionADCH
+000104 9160 0101 		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
+000106 e050      		ldi R21,0x00
+000107 e148      		ldi R20,0x18						;Carga el numero 24 r21:r20
+000108 940e 01ad 		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
+00010a 9310 0112 		sts GRANDEH, r17					;Guardamos resultado de la primer multiplicacion
+00010c 9300 0113 		sts GRANDEL, r16
                  
-000110 9170 0100 		lds R23, VAL_TensionADCH
-000112 9160 0101 		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
-000114 e050      		ldi R21,0x00
-000115 e24b      		ldi R20,0x2B						;Carga el numero 43 r21:r20
-000116 940e 01af 		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
+00010e 9170 0100 		lds R23, VAL_TensionADCH
+000110 9160 0101 		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
+000112 e050      		ldi R21,0x00
+000113 e24b      		ldi R20,0x2B						;Carga el numero 43 r21:r20
+000114 940e 01ad 		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
                  	
-000118 e624      		ldi	DivisorL,0x64					;El dividendo ya esta en r16 y r17
-000119 e030      		ldi	DivisorH,0x00					;Dividimos por 100
-00011a 940e 01c1 		call Division16_16
+000116 e624      		ldi	DivisorL,0x64					;El dividendo ya esta en r16 y r17
+000117 e030      		ldi	DivisorH,0x00					;Dividimos por 100
+000118 940e 01bf 		call Division16_16
                  
-00011c 9130 0112 		lds r19, GRANDEH
-00011e 9120 0113 		lds r18, GRANDEL
+00011a 9130 0112 		lds r19, GRANDEH
+00011c 9120 0113 		lds r18, GRANDEL
                  
-000120 0f31      		add r19, DividendoH					;Sumamos primer calculo con segundo calculo
-000121 1f20      		adc r18, DividendoL
-000122 9330 0104 		sts	TensionH, r19					;Valor de la tension real
-000124 9320 0105 		sts	TensionL, r18
-000126 9508      		ret
+00011e 0f31      		add r19, DividendoH					;Sumamos primer calculo con segundo calculo
+00011f 1f20      		adc r18, DividendoL
+000120 9330 0104 		sts	TensionH, r19					;Valor de la tension real
+000122 9320 0105 		sts	TensionL, r18
+000124 9508      		ret
                  
                  ;################################################################### CALCULO DE CORRIENTE ###################################################################
                   
                  	CALCULO_CORRIENTE:
                  
-000127 9170 0102 		lds r23, VAL_CorrienteADCH			;Carga valores del ADC
-000129 9160 0103 		lds r22, VAL_CorrienteADCL
-00012b e081      		ldi r24, 0x01						;Carga complemento de 511 para restar
-00012c ef9e      		ldi r25, 0xFE
-00012d 0f68      		add r22, r24						;Realiza suma (resta)
-00012e 1f79      		adc r23, r25
-00012f e070      		ldi r23, 0x00						;Ponemos 0 en la parte alta del resultado
-000130 e052      		ldi r21, 0x02						;Carga 587 (factor para adecuar la medicion) para multiplicar
-000131 e44b      		ldi r20, 0x4B
-000132 940e 01af 		call mul16x16_16					;Llama funcion multiplicacion
+000125 9170 0102 		lds r23, VAL_CorrienteADCH			;Carga valores del ADC
+000127 9160 0103 		lds r22, VAL_CorrienteADCL
+000129 e081      		ldi r24, 0x01						;Carga complemento de 511 para restar
+00012a ef9e      		ldi r25, 0xFE
+00012b 0f68      		add r22, r24						;Realiza suma (resta)
+00012c 1f79      		adc r23, r25
+00012d e070      		ldi r23, 0x00						;Ponemos 0 en la parte alta del resultado
+00012e e052      		ldi r21, 0x02						;Carga 587 (factor para adecuar la medicion) para multiplicar
+00012f e44b      		ldi r20, 0x4B
+000130 940e 01ad 		call mul16x16_16					;Llama funcion multiplicacion
                  
-000134 e030      		ldi DivisorH, 0x00					;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
-000135 e02a      		ldi DivisorL, 0x0A
-000136 940e 01c1 		call Division16_16					;Llama funcion division
+000132 e030      		ldi DivisorH, 0x00					;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
+000133 e02a      		ldi DivisorL, 0x0A
+000134 940e 01bf 		call Division16_16					;Llama funcion division
                  
-000138 9310 0108 		sts CorrienteH, r17					;Resultado corriente
-00013a 9300 0109 		sts CorrienteL, r16				
-00013c 9508      		ret
+000136 9310 0108 		sts CorrienteH, r17					;Resultado corriente
+000138 9300 0109 		sts CorrienteL, r16				
+00013a 9508      		ret
                  
                  ;################################################################### CALCULO DE POTENCIA ###################################################################
                   
                  	CALCULO_POTENCIA:
                  
-00013d 9170 0108 		lds r23, CorrienteH					;Cargar valor de corriente
-00013f 9160 0109 		lds r22, CorrienteL
-000141 9110 0104 		lds DividendoH, TensionH			;Cargar valor de tension
-000143 9100 0105 		lds DividendoL, TensionL
-000145 e033      		ldi DivisorH, 0x03					;Cargar 1000 en divisor
-000146 ee28      		ldi DivisorL, 0xE8
-000147 940e 01c1 		call Division16_16					;Llamar funcion division
-000149 9310 0112 		sts GRANDEH, r17					;Guardar resultado
-00014b 9300 0113 		sts GRANDEL, r16
+00013b 9170 0108 		lds r23, CorrienteH					;Cargar valor de corriente
+00013d 9160 0109 		lds r22, CorrienteL
+00013f 9110 0104 		lds DividendoH, TensionH			;Cargar valor de tension
+000141 9100 0105 		lds DividendoL, TensionL
+000143 e033      		ldi DivisorH, 0x03					;Cargar 1000 en divisor
+000144 ee28      		ldi DivisorL, 0xE8
+000145 940e 01bf 		call Division16_16					;Llamar funcion division
+000147 9310 0112 		sts GRANDEH, r17					;Guardar resultado
+000149 9300 0113 		sts GRANDEL, r16
                  
-00014d 2d1f      		mov DividendoH, RestoH				;Cargar resto para dividir
-00014e 2d0e      		mov DividendoL, RestoL
-00014f e030      		ldi DivisorH, 0x00					;Cargar 100 en divisor
-000150 e624      		ldi DivisorL, 0x64
-000151 940e 01c1 		call Division16_16					;Llamar funcion division		
-000153 9300 0114 		sts Temp1, r16						;Guardar resultado (primer decimal)
+00014b 2d1f      		mov DividendoH, RestoH				;Cargar resto para dividir
+00014c 2d0e      		mov DividendoL, RestoL
+00014d e030      		ldi DivisorH, 0x00					;Cargar 100 en divisor
+00014e e624      		ldi DivisorL, 0x64
+00014f 940e 01bf 		call Division16_16					;Llamar funcion division		
+000151 9300 0114 		sts Temp1, r16						;Guardar resultado (primer decimal)
                  
-000155 2d1f      		mov DividendoH, RestoH				;Cargar resto para dividir
-000156 2d0e      		mov DividendoL, RestoL
-000157 e030      		ldi DivisorH, 0x00					;Cargar 10 en divisor
-000158 e02a      		ldi DivisorL, 0x0A
-000159 940e 01c1 		call Division16_16					;Llamar funcion division
-00015b 9300 0115 		sts Temp2, r16						;Guardar resultado (segundo decimal)
-00015d 92e0 0116 		sts Temp3, RestoL					;Guardar resto (tercer decimal)
+000153 2d1f      		mov DividendoH, RestoH				;Cargar resto para dividir
+000154 2d0e      		mov DividendoL, RestoL
+000155 e030      		ldi DivisorH, 0x00					;Cargar 10 en divisor
+000156 e02a      		ldi DivisorL, 0x0A
+000157 940e 01bf 		call Division16_16					;Llamar funcion division
+000159 9300 0115 		sts Temp2, r16						;Guardar resultado (segundo decimal)
+00015b 92e0 0116 		sts Temp3, RestoL					;Guardar resto (tercer decimal)
                  
-00015f 9150 0112 		lds r21, GRANDEH
-000161 9140 0113 		lds r20, GRANDEL
-000163 940e 01af 		call mul16x16_16					;Llamar funcion multiplicacion
-000165 9310 0106 		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
-000167 9300 0107 		sts PotenciaL, r16
+00015d 9150 0112 		lds r21, GRANDEH
+00015f 9140 0113 		lds r20, GRANDEL
+000161 940e 01ad 		call mul16x16_16					;Llamar funcion multiplicacion
+000163 9310 0106 		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+000165 9300 0107 		sts PotenciaL, r16
                  
-000169 9170 0108 		lds r23, CorrienteH					;Cargar valor de corriente
-00016b 9160 0109 		lds r22, CorrienteL
-00016d e050      		ldi r21, 0x00						;Cargar valor del primer decimal
-00016e 9140 0114 		lds r20, Temp1
-000170 940e 01af 		call mul16x16_16					;Llamar funcion multiplicacion
-000172 e030      		ldi DivisorH, 0x00					;Cargar 10 en divisor para acomodar numero
-000173 e02a      		ldi DivisorL, 0x0A
-000174 940e 01c1 		call Division16_16					;Llamar funcion division		
-000176 9130 0106 		lds r19, PotenciaH					;Cargar valor temporal de potencia
-000178 9120 0107 		lds r18, PotenciaL
-00017a 0f13      		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
-00017b 1f02      		adc r16, r18
-00017c 9310 0106 		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
-00017e 9300 0107 		sts PotenciaL, r16
+000167 9170 0108 		lds r23, CorrienteH					;Cargar valor de corriente
+000169 9160 0109 		lds r22, CorrienteL
+00016b e050      		ldi r21, 0x00						;Cargar valor del primer decimal
+00016c 9140 0114 		lds r20, Temp1
+00016e 940e 01ad 		call mul16x16_16					;Llamar funcion multiplicacion
+000170 e030      		ldi DivisorH, 0x00					;Cargar 10 en divisor para acomodar numero
+000171 e02a      		ldi DivisorL, 0x0A
+000172 940e 01bf 		call Division16_16					;Llamar funcion division		
+000174 9130 0106 		lds r19, PotenciaH					;Cargar valor temporal de potencia
+000176 9120 0107 		lds r18, PotenciaL
+000178 0f13      		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
+000179 1f02      		adc r16, r18
+00017a 9310 0106 		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+00017c 9300 0107 		sts PotenciaL, r16
                  
-000180 9170 0108 		lds r23, CorrienteH					;Cargar valor de corriente
-000182 9160 0109 		lds r22, CorrienteL
-000184 e050      		ldi r21, 0x00						;Cargar valor del segundo decimal
-000185 9140 0115 		lds r20, Temp2
-000187 940e 01af 		call mul16x16_16					;Llamar funcion multiplicacion
-000189 e030      		ldi DivisorH, 0x00					;Cargar 100 en divisor para acomodar numero
-00018a e624      		ldi DivisorL, 0x64
-00018b 940e 01c1 		call Division16_16					;Llamar funcion division		
-00018d 9130 0106 		lds r19, PotenciaH					;Cargar valor temporal de potencia
-00018f 9120 0107 		lds r18, PotenciaL
-000191 0f13      		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
-000192 1f02      		adc r16, r18
-000193 9310 0106 		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
-000195 9300 0107 		sts PotenciaL, r16
+00017e 9170 0108 		lds r23, CorrienteH					;Cargar valor de corriente
+000180 9160 0109 		lds r22, CorrienteL
+000182 e050      		ldi r21, 0x00						;Cargar valor del segundo decimal
+000183 9140 0115 		lds r20, Temp2
+000185 940e 01ad 		call mul16x16_16					;Llamar funcion multiplicacion
+000187 e030      		ldi DivisorH, 0x00					;Cargar 100 en divisor para acomodar numero
+000188 e624      		ldi DivisorL, 0x64
+000189 940e 01bf 		call Division16_16					;Llamar funcion division		
+00018b 9130 0106 		lds r19, PotenciaH					;Cargar valor temporal de potencia
+00018d 9120 0107 		lds r18, PotenciaL
+00018f 0f13      		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
+000190 1f02      		adc r16, r18
+000191 9310 0106 		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+000193 9300 0107 		sts PotenciaL, r16
                  
-000197 9170 0108 		lds r23, CorrienteH					;Cargar valor de corriente
-000199 9160 0109 		lds r22, CorrienteL
-00019b e050      		ldi r21, 0x00						;Cargar valor del segundo decimal
-00019c 9140 0116 		lds r20, Temp3
-00019e 940e 01af 		call mul16x16_16					;Llamar funcion multiplicacion
-0001a0 e033      		ldi DivisorH, 0x03					;Cargar 1000 en divisor para acomodar numero
-0001a1 ee28      		ldi DivisorL, 0xE8
-0001a2 940e 01c1 		call Division16_16					;Llamar funcion division		
-0001a4 9130 0106 		lds r19, PotenciaH					;Cargar valor temporal de potencia
-0001a6 9120 0107 		lds r18, PotenciaL
-0001a8 0f13      		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
-0001a9 1f02      		adc r16, r18
-0001aa 9310 0106 		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
-0001ac 9300 0107 		sts PotenciaL, r16
+000195 9170 0108 		lds r23, CorrienteH					;Cargar valor de corriente
+000197 9160 0109 		lds r22, CorrienteL
+000199 e050      		ldi r21, 0x00						;Cargar valor del segundo decimal
+00019a 9140 0116 		lds r20, Temp3
+00019c 940e 01ad 		call mul16x16_16					;Llamar funcion multiplicacion
+00019e e033      		ldi DivisorH, 0x03					;Cargar 1000 en divisor para acomodar numero
+00019f ee28      		ldi DivisorL, 0xE8
+0001a0 940e 01bf 		call Division16_16					;Llamar funcion division		
+0001a2 9130 0106 		lds r19, PotenciaH					;Cargar valor temporal de potencia
+0001a4 9120 0107 		lds r18, PotenciaL
+0001a6 0f13      		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
+0001a7 1f02      		adc r16, r18
+0001a8 9310 0106 		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+0001aa 9300 0107 		sts PotenciaL, r16
                  
-0001ae 9508      		ret
+0001ac 9508      		ret
                  		
                  ;################################################################### FUNCION DE MULTIPLICACION ###################################################################
                  
                  	mul16x16_16:
                  
-0001af 9f64      		mul	r22, r20				; al * bl
-0001b0 0180      		movw	r17:r16, r1:r0
-0001b1 9f74      		mul	r23, r20				; ah * bl
+0001ad 9f64      		mul	r22, r20				; al * bl
+0001ae 0180      		movw	r17:r16, r1:r0
+0001af 9f74      		mul	r23, r20				; ah * bl
+0001b0 0d10      		add	r17, r0
+0001b1 9f56      		mul	r21, r22				; bh * al
 0001b2 0d10      		add	r17, r0
-0001b3 9f56      		mul	r21, r22				; bh * al
-0001b4 0d10      		add	r17, r0
                  		;resultado r17, r16
-0001b5 9508      		ret
+0001b3 9508      		ret
                  
                  ;############################################################ FUNCION DE MULTIPLICACION DEL RESTO ###################################################################
                  
                  	mul16x16_24:
-0001b6 9f75      		mul		r23, r21		; ah * bh
-0001b7 2d20      		mov		r18, r0
-0001b8 9f64      		mul		r22, r20		; al * bl
-0001b9 0180      		movw	r17:r16, r1:r0
-0001ba 9f74      		mul		r23, r20		; ah * bl
-0001bb 0d10      		add		r17, r0
-0001bc 1d21      		adc		r18, r1
-0001bd 9f56      		mul		r21, r22		; bh * al
-0001be 0d10      		add		r17, r0
-0001bf 1d21      		adc		r18, r1
+0001b4 9f75      		mul		r23, r21		; ah * bh
+0001b5 2d20      		mov		r18, r0
+0001b6 9f64      		mul		r22, r20		; al * bl
+0001b7 0180      		movw	r17:r16, r1:r0
+0001b8 9f74      		mul		r23, r20		; ah * bl
+0001b9 0d10      		add		r17, r0
+0001ba 1d21      		adc		r18, r1
+0001bb 9f56      		mul		r21, r22		; bh * al
+0001bc 0d10      		add		r17, r0
+0001bd 1d21      		adc		r18, r1
                  		; resultado r18, r17, r16
-0001c0 9508      		ret
+0001be 9508      		ret
                  
                  
                  ;################################################################### FUNCION DE DIVISION ###################################################################
                  
                  	Division16_16:	
-0001c1 24ee      		clr	RestoL					; borra byte low de Resto
-0001c2 18ff      		sub	RestoH,RestoH			; borra el byte alto y acarreo
-0001c3 e141      		ldi	Contador,17				; contador de bucle infinito
+0001bf 24ee      		clr	RestoL					; borra byte low de Resto
+0001c0 18ff      		sub	RestoH,RestoH			; borra el byte alto y acarreo
+0001c1 e141      		ldi	Contador,17				; contador de bucle infinito
                  		div_1:	
-0001c4 1f00      		rol	DividendoL				; desplazo a la izquierda el dividendo
-0001c5 1f11      		rol	DividendoH
-0001c6 954a      		dec	Contador				; decremento contador
-0001c7 f429      		brne	div_2				;if done
-0001c8 92e0 010a 		sts RestodivL, RestoL
-0001ca 92f0 010b 		sts RestodivH, RestoH
-0001cc 9508      		ret							; salida
+0001c2 1f00      		rol	DividendoL				; desplazo a la izquierda el dividendo
+0001c3 1f11      		rol	DividendoH
+0001c4 954a      		dec	Contador				; decremento contador
+0001c5 f429      		brne	div_2				;if done
+0001c6 92e0 010a 		sts RestodivL, RestoL
+0001c8 92f0 010b 		sts RestodivH, RestoH
+0001ca 9508      		ret							; salida
                  		div_2:	
-0001cd 1cee      		rol	RestoL					;desplazo a la izquerda el resto
-0001ce 1cff      		rol	RestoH
-0001cf 1ae2      		sub	RestoL,DivisorL			;resto = resto - divisor
-0001d0 0af3      		sbc	RestoH,DivisorH	
-0001d1 f420      		brcc	div_3				;si el resultado es negativo
-0001d2 0ee2      		add	RestoL,DivisorL			; restaurar el resto
-0001d3 1ef3      		adc	RestoH,DivisorH
-0001d4 9488      		clc							;limpia el acarreo para ser deplazado al resultado
-0001d5 cfee      		rjmp	div_1				;else
+0001cb 1cee      		rol	RestoL					;desplazo a la izquerda el resto
+0001cc 1cff      		rol	RestoH
+0001cd 1ae2      		sub	RestoL,DivisorL			;resto = resto - divisor
+0001ce 0af3      		sbc	RestoH,DivisorH	
+0001cf f420      		brcc	div_3				;si el resultado es negativo
+0001d0 0ee2      		add	RestoL,DivisorL			; restaurar el resto
+0001d1 1ef3      		adc	RestoH,DivisorH
+0001d2 9488      		clc							;limpia el acarreo para ser deplazado al resultado
+0001d3 cfee      		rjmp	div_1				;else
                  		div_3:	
-0001d6 9408      		sec							;pone a 1 la bandera de acarreo para ser trasladado al resultado
-0001d7 cfec      		rjmp	div_1
+0001d4 9408      		sec							;pone a 1 la bandera de acarreo para ser trasladado al resultado
+0001d5 cfec      		rjmp	div_1
                  		; resultado de la division r17, r16
                  		; resto de la division r15, r14
                  
@@ -1520,354 +1528,672 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
                  
                  	MOSTRAR_POTENCIA:
                  		
-0001d8 90d0 0106 		lds ENTEROH, PotenciaH		;Cargar valor de potencia alta
-0001da 90c0 0107 		lds ENTEROL, PotenciaL		;Cargar valor de potencia baja
+0001d6 90d0 0106 		lds ENTEROH, PotenciaH		;Cargar valor de potencia alta
+0001d8 90c0 0107 		lds ENTEROL, PotenciaL		;Cargar valor de potencia baja
                  		
-0001dc 940e 02d4 		call DESCOMPOSICION
+0001da 940e 02d2 		call DESCOMPOSICION
                  				
-0001de 940e 02cf 		call USART_ESPERA			
-0001e0 e540      		ldi r20, 0x50				; P
-0001e1 9340 00c6 		sts UDR0, r20
+0001dc 940e 02cd 		call USART_ESPERA			
+0001de e540      		ldi r20, 0x50				; P
+0001df 9340 00c6 		sts UDR0, r20
                  
-0001e3 940e 02cf 		call USART_ESPERA
-0001e5 e240      		ldi r20, 0x20				; (espacio)
-0001e6 9340 00c6 		sts UDR0, r20
+0001e1 940e 02cd 		call USART_ESPERA
+0001e3 e240      		ldi r20, 0x20				; (espacio)
+0001e4 9340 00c6 		sts UDR0, r20
                  
-0001e8 940e 02cf 		call USART_ESPERA			
-0001ea e34d      		ldi r20, 0x3D				; =
-0001eb 9340 00c6 		sts UDR0, r20
+0001e6 940e 02cd 		call USART_ESPERA			
+0001e8 e34d      		ldi r20, 0x3D				; =
+0001e9 9340 00c6 		sts UDR0, r20
                  
-0001ed 940e 02cf 		call USART_ESPERA
-0001ef e240      		ldi r20, 0x20				; (espacio)
-0001f0 9340 00c6 		sts UDR0, r20
+0001eb 940e 02cd 		call USART_ESPERA
+0001ed e240      		ldi r20, 0x20				; (espacio)
+0001ee 9340 00c6 		sts UDR0, r20
                  
-0001f2 940e 02f9 		call MOSTRAR
+0001f0 940e 02f7 		call MOSTRAR
                  
-0001f4 940e 02cf 		call USART_ESPERA
-0001f6 e240      		ldi r20, 0x20				; (espacio)
-0001f7 9340 00c6 		sts UDR0, r20
+0001f2 940e 02cd 		call USART_ESPERA
+0001f4 e240      		ldi r20, 0x20				; (espacio)
+0001f5 9340 00c6 		sts UDR0, r20
                  
-0001f9 940e 02cf 		call USART_ESPERA			
-0001fb e547      		ldi r20, 0x57				; W
-0001fc 9340 00c6 		sts UDR0, r20
+0001f7 940e 02cd 		call USART_ESPERA			
+0001f9 e547      		ldi r20, 0x57				; W
+0001fa 9340 00c6 		sts UDR0, r20
                  
-0001fe 940e 02cf 		call USART_ESPERA			
-000200 e641      		ldi r20, 0x61				; a
-000201 9340 00c6 		sts UDR0, r20
+0001fc 940e 02cd 		call USART_ESPERA			
+0001fe e641      		ldi r20, 0x61				; a
+0001ff 9340 00c6 		sts UDR0, r20
                  
-000203 940e 02cf 		call USART_ESPERA			
-000205 e744      		ldi r20, 0x74				; t
-000206 9340 00c6 		sts UDR0, r20
+000201 940e 02cd 		call USART_ESPERA			
+000203 e744      		ldi r20, 0x74				; t
+000204 9340 00c6 		sts UDR0, r20
                  
-000208 940e 02cf 		call USART_ESPERA			
-00020a e744      		ldi r20, 0x74				; t
-00020b 9340 00c6 		sts UDR0, r20
+000206 940e 02cd 		call USART_ESPERA			
+000208 e744      		ldi r20, 0x74				; t
+000209 9340 00c6 		sts UDR0, r20
                  
-00020d 940e 02cf 		call USART_ESPERA			
-00020f e04a      		ldi r20, 0x0A				; (salto de linea)
-000210 9340 00c6 		sts UDR0, r20
+00020b 940e 02cd 		call USART_ESPERA			
+00020d e04a      		ldi r20, 0x0A				; (salto de linea)
+00020e 9340 00c6 		sts UDR0, r20
                  
-000212 940e 02cf 		call USART_ESPERA			
-000214 e04d      		ldi r20, 0x0D				; (retorno de carro)
-000215 9340 00c6 		sts UDR0, r20
+000210 940e 02cd 		call USART_ESPERA			
+000212 e04d      		ldi r20, 0x0D				; (retorno de carro)
+000213 9340 00c6 		sts UDR0, r20
                  
-000217 2711      		clr r17						;Limpiar registro de dato recibido
-000218 9310 0111 		sts DATO_RX, r17
+000215 2711      		clr r17						;Limpiar registro de dato recibido
+000216 9310 0111 		sts DATO_RX, r17
                  	
-00021a 9508      		ret
+000218 9508      		ret
                  
                  ;######################################################### MOSTRAR CORRIENTE #########################################################
                  
                  	MOSTRAR_CORRIENTE:
                  		
-00021b 90d0 0108 		lds ENTEROH, CorrienteH		;Cargar valor de corriente alta
-00021d 90c0 0109 		lds ENTEROL, CorrienteL		;Cargar valor de corriente baja
+000219 90d0 0108 		lds ENTEROH, CorrienteH		;Cargar valor de corriente alta
+00021b 90c0 0109 		lds ENTEROL, CorrienteL		;Cargar valor de corriente baja
                  		
-00021f 940e 02d4 		call DESCOMPOSICION
+00021d 940e 02d2 		call DESCOMPOSICION
                  				
-000221 940e 02cf 		call USART_ESPERA			
-000223 e449      		ldi r20, 0x49				; I
-000224 9340 00c6 		sts UDR0, r20
+00021f 940e 02cd 		call USART_ESPERA			
+000221 e449      		ldi r20, 0x49				; I
+000222 9340 00c6 		sts UDR0, r20
                  
-000226 940e 02cf 		call USART_ESPERA
-000228 e240      		ldi r20, 0x20				; (espacio)
-000229 9340 00c6 		sts UDR0, r20
+000224 940e 02cd 		call USART_ESPERA
+000226 e240      		ldi r20, 0x20				; (espacio)
+000227 9340 00c6 		sts UDR0, r20
                  
-00022b 940e 02cf 		call USART_ESPERA			
-00022d e34d      		ldi r20, 0x3D				; =
-00022e 9340 00c6 		sts UDR0, r20
+000229 940e 02cd 		call USART_ESPERA			
+00022b e34d      		ldi r20, 0x3D				; =
+00022c 9340 00c6 		sts UDR0, r20
                  
-000230 940e 02cf 		call USART_ESPERA
-000232 e240      		ldi r20, 0x20				; (espacio)
-000233 9340 00c6 		sts UDR0, r20
+00022e 940e 02cd 		call USART_ESPERA
+000230 e240      		ldi r20, 0x20				; (espacio)
+000231 9340 00c6 		sts UDR0, r20
                  
-000235 940e 02f9 		call MOSTRAR
+000233 940e 02f7 		call MOSTRAR
                  
-000237 940e 02cf 		call USART_ESPERA
-000239 e240      		ldi r20, 0x20				; (espacio)
-00023a 9340 00c6 		sts UDR0, r20
+000235 940e 02cd 		call USART_ESPERA
+000237 e240      		ldi r20, 0x20				; (espacio)
+000238 9340 00c6 		sts UDR0, r20
                  
-00023c 940e 02cf 		call USART_ESPERA			
-00023e e441      		ldi r20, 0x41				; A
-00023f 9340 00c6 		sts UDR0, r20
+00023a 940e 02cd 		call USART_ESPERA			
+00023c e441      		ldi r20, 0x41				; A
+00023d 9340 00c6 		sts UDR0, r20
                  
-000241 940e 02cf 		call USART_ESPERA			
-000243 e64d      		ldi r20, 0x6D				; m
-000244 9340 00c6 		sts UDR0, r20
+00023f 940e 02cd 		call USART_ESPERA			
+000241 e64d      		ldi r20, 0x6D				; m
+000242 9340 00c6 		sts UDR0, r20
                  
-000246 940e 02cf 		call USART_ESPERA			
-000248 e740      		ldi r20, 0x70				; p
-000249 9340 00c6 		sts UDR0, r20
+000244 940e 02cd 		call USART_ESPERA			
+000246 e740      		ldi r20, 0x70				; p
+000247 9340 00c6 		sts UDR0, r20
                  
-00024b 940e 02cf 		call USART_ESPERA			
-00024d e645      		ldi r20, 0x65				; e
-00024e 9340 00c6 		sts UDR0, r20
+000249 940e 02cd 		call USART_ESPERA			
+00024b e645      		ldi r20, 0x65				; e
+00024c 9340 00c6 		sts UDR0, r20
                  		
-000250 940e 02cf 		call USART_ESPERA			
-000252 e742      		ldi r20, 0x72				; r
-000253 9340 00c6 		sts UDR0, r20
+00024e 940e 02cd 		call USART_ESPERA			
+000250 e742      		ldi r20, 0x72				; r
+000251 9340 00c6 		sts UDR0, r20
                  
-000255 940e 02cf 		call USART_ESPERA			
-000257 e04a      		ldi r20, 0x0A				; (salto de linea)
-000258 9340 00c6 		sts UDR0, r20
+000253 940e 02cd 		call USART_ESPERA			
+000255 e04a      		ldi r20, 0x0A				; (salto de linea)
+000256 9340 00c6 		sts UDR0, r20
                  
-00025a 940e 02cf 		call USART_ESPERA			
-00025c e04d      		ldi r20, 0x0D				; (retorno de carro)
-00025d 9340 00c6 		sts UDR0, r20
+000258 940e 02cd 		call USART_ESPERA			
+00025a e04d      		ldi r20, 0x0D				; (retorno de carro)
+00025b 9340 00c6 		sts UDR0, r20
                  
-00025f 2711      		clr r17						;Limpiar registro de dato recibido
-000260 9310 0111 		sts DATO_RX, r17
+00025d 2711      		clr r17						;Limpiar registro de dato recibido
+00025e 9310 0111 		sts DATO_RX, r17
                  	
-000262 9508      		ret
+000260 9508      		ret
                  
                  ;########################################################## MOSTRAR TENSION #########################################################
                  
                  	MOSTRAR_TENSION:
                  
-000263 90d0 0104 		lds ENTEROH, TensionH		;Cargar valor de tension alta
-000265 90c0 0105 		lds ENTEROL, TensionL		;Cargar valor de tension baja
+000261 90d0 0104 		lds ENTEROH, TensionH		;Cargar valor de tension alta
+000263 90c0 0105 		lds ENTEROL, TensionL		;Cargar valor de tension baja
                  		
-000267 940e 02d4 		call DESCOMPOSICION
+000265 940e 02d2 		call DESCOMPOSICION
                  				
-000269 940e 02cf 		call USART_ESPERA			
-00026b e546      		ldi r20, 0x56				; V
-00026c 9340 00c6 		sts UDR0, r20
+000267 940e 02cd 		call USART_ESPERA			
+000269 e546      		ldi r20, 0x56				; V
+00026a 9340 00c6 		sts UDR0, r20
                  
-00026e 940e 02cf 		call USART_ESPERA
-000270 e240      		ldi r20, 0x20				; (espacio)
-000271 9340 00c6 		sts UDR0, r20
+00026c 940e 02cd 		call USART_ESPERA
+00026e e240      		ldi r20, 0x20				; (espacio)
+00026f 9340 00c6 		sts UDR0, r20
                  
-000273 940e 02cf 		call USART_ESPERA			
-000275 e34d      		ldi r20, 0x3D				; =
-000276 9340 00c6 		sts UDR0, r20
+000271 940e 02cd 		call USART_ESPERA			
+000273 e34d      		ldi r20, 0x3D				; =
+000274 9340 00c6 		sts UDR0, r20
                  
-000278 940e 02cf 		call USART_ESPERA
-00027a e240      		ldi r20, 0x20				; (espacio)
-00027b 9340 00c6 		sts UDR0, r20
+000276 940e 02cd 		call USART_ESPERA
+000278 e240      		ldi r20, 0x20				; (espacio)
+000279 9340 00c6 		sts UDR0, r20
                  
-00027d 940e 02f9 		call MOSTRAR
+00027b 940e 02f7 		call MOSTRAR
                  
-00027f 940e 02cf 		call USART_ESPERA
-000281 e240      		ldi r20, 0x20				; (espacio)
-000282 9340 00c6 		sts UDR0, r20
+00027d 940e 02cd 		call USART_ESPERA
+00027f e240      		ldi r20, 0x20				; (espacio)
+000280 9340 00c6 		sts UDR0, r20
                  
-000284 940e 02cf 		call USART_ESPERA			
-000286 e546      		ldi r20, 0x56				; V
-000287 9340 00c6 		sts UDR0, r20
+000282 940e 02cd 		call USART_ESPERA			
+000284 e546      		ldi r20, 0x56				; V
+000285 9340 00c6 		sts UDR0, r20
                  
-000289 940e 02cf 		call USART_ESPERA			
-00028b e64f      		ldi r20, 0x6F				; o
-00028c 9340 00c6 		sts UDR0, r20
+000287 940e 02cd 		call USART_ESPERA			
+000289 e64f      		ldi r20, 0x6F				; o
+00028a 9340 00c6 		sts UDR0, r20
                  
-00028e 940e 02cf 		call USART_ESPERA			
-000290 e64c      		ldi r20, 0x6C				; l
-000291 9340 00c6 		sts UDR0, r20
+00028c 940e 02cd 		call USART_ESPERA			
+00028e e64c      		ldi r20, 0x6C				; l
+00028f 9340 00c6 		sts UDR0, r20
                  
-000293 940e 02cf 		call USART_ESPERA			
-000295 e744      		ldi r20, 0x74				; t
-000296 9340 00c6 		sts UDR0, r20
+000291 940e 02cd 		call USART_ESPERA			
+000293 e744      		ldi r20, 0x74				; t
+000294 9340 00c6 		sts UDR0, r20
                  		
-000298 940e 02cf 		call USART_ESPERA			
-00029a e04a      		ldi r20, 0x0A				; (salto de linea)
-00029b 9340 00c6 		sts UDR0, r20
+000296 940e 02cd 		call USART_ESPERA			
+000298 e04a      		ldi r20, 0x0A				; (salto de linea)
+000299 9340 00c6 		sts UDR0, r20
                  
-00029d 940e 02cf 		call USART_ESPERA			
-00029f e04d      		ldi r20, 0x0D				; (retorno de carro)
-0002a0 9340 00c6 		sts UDR0, r20
+00029b 940e 02cd 		call USART_ESPERA			
+00029d e04d      		ldi r20, 0x0D				; (retorno de carro)
+00029e 9340 00c6 		sts UDR0, r20
                  
-0002a2 2711      		clr r17						;Limpiar registro de dato recibido
-0002a3 9310 0111 		sts DATO_RX, r17
-0002a5 9508      		ret
+0002a0 2711      		clr r17						;Limpiar registro de dato recibido
+0002a1 9310 0111 		sts DATO_RX, r17
+0002a3 9508      		ret
                  
                  ;########################################################## USART RECEPCION #########################################################
                  
                  	USART_RXC:
                  
+0002a4 92df
+0002a5 b6df
 0002a6 92df
-0002a7 b6df
-0002a8 92df
-0002a9 92cf
-0002aa 92ef
-0002ab 92ff
-0002ac 930f
-0002ad 931f
-0002ae 932f
-0002af 933f
-0002b0 934f
-0002b1 935f
-0002b2 936f
-0002b3 937f
-0002b4 938f
-0002b5 939f
-0002b6 93af
-0002b7 93bf      		PUSH_SREG
-0002b8 9100 00c6 		lds r16, UDR0
-0002ba 9300 0111 		sts DATO_RX, r16
-0002bc 91bf
-0002bd 91af
-0002be 919f
-0002bf 918f
-0002c0 917f
-0002c1 916f
-0002c2 915f
-0002c3 914f
-0002c4 913f
-0002c5 912f
-0002c6 911f
-0002c7 910f
-0002c8 90ff
-0002c9 90ef
-0002ca 90cf
-0002cb 90df
-0002cc bedf
-0002cd 90df      		POP_SREG
-0002ce 9518      		reti
+0002a7 92cf
+0002a8 92ef
+0002a9 92ff
+0002aa 930f
+0002ab 931f
+0002ac 932f
+0002ad 933f
+0002ae 934f
+0002af 935f
+0002b0 936f
+0002b1 937f
+0002b2 938f
+0002b3 939f
+0002b4 93af
+0002b5 93bf      		PUSH_SREG
+0002b6 9100 00c6 		lds r16, UDR0
+0002b8 9300 0111 		sts DATO_RX, r16
+0002ba 91bf
+0002bb 91af
+0002bc 919f
+0002bd 918f
+0002be 917f
+0002bf 916f
+0002c0 915f
+0002c1 914f
+0002c2 913f
+0002c3 912f
+0002c4 911f
+0002c5 910f
+0002c6 90ff
+0002c7 90ef
+0002c8 90cf
+0002c9 90df
+0002ca bedf
+0002cb 90df      		POP_SREG
+0002cc 9518      		reti
                  
                  ;########################################################## USART ESPERA #########################################################
                  
                  	USART_ESPERA:
                  
-0002cf 91a0 00c0 		lds r26, UCSR0A				;Espera que se limpie la bandera de transmicion
-0002d1 ffa5      		sbrs r26, UDRE0
-0002d2 cffc      		rjmp USART_ESPERA
-0002d3 9508      		ret
+0002cd 91a0 00c0 		lds r26, UCSR0A				;Espera que se limpie la bandera de transmicion
+0002cf ffa5      		sbrs r26, UDRE0
+0002d0 cffc      		rjmp USART_ESPERA
+0002d1 9508      		ret
                  
                  ;########################################################## DESCOMPOSICION ENTERO #########################################################
                  		
                  	DESCOMPOSICION:
                  
-0002d4 e0ec      		ldi	ZL, LOW(VECTOR)
-0002d5 e0f1      		ldi	ZH, HIGH(VECTOR)			
-0002d6 e277      		ldi rmp, 0x27				;Cargamos 10000
-0002d7 2f67      		mov rBin2H,rmp
-0002d8 e170      		ldi rmp, 0x10
-0002d9 2f57      		mov rBin2L,rmp
-0002da d012      		rcall Bin2ToDigit			;Funcion para calcular digito
-0002db e073      		ldi rmp, 0x03				;Cargamos 1000
-0002dc 2f67      		mov rBin2H,rmp
-0002dd ee78      		ldi rmp, 0xE8
-0002de 2f57      		mov rBin2L,rmp
-0002df d00d      		rcall Bin2ToDigit			;Funcion para calcular digito
-0002e0 e070      		ldi rmp, 0x00				;Cargamos 100
-0002e1 2f67      		mov rBin2H,rmp
-0002e2 e674      		ldi rmp, 0x64
-0002e3 2f57      		mov rBin2L,rmp
-0002e4 d008      		rcall Bin2ToDigit			;Funcion para calcular digito
-0002e5 e070      		ldi rmp, 0x00				;Cargamos 10
-0002e6 2f67      		mov rBin2H,rmp
-0002e7 e07a      		ldi rmp, 0x0A
-0002e8 2f57      		mov rBin2L,rmp
-0002e9 d003      		rcall Bin2ToDigit			;Funcion para calcular digito
-0002ea 82c0      		st z,ENTEROL
-0002eb 9734      		sbiw ZL,4					;Poner el puntero en el primer BCD
-0002ec 9508      		ret
+0002d2 e0ec      		ldi	ZL, LOW(VECTOR)
+0002d3 e0f1      		ldi	ZH, HIGH(VECTOR)			
+0002d4 e277      		ldi rmp, 0x27				;Cargamos 10000
+0002d5 2f67      		mov rBin2H,rmp
+0002d6 e170      		ldi rmp, 0x10
+0002d7 2f57      		mov rBin2L,rmp
+0002d8 d012      		rcall Bin2ToDigit			;Funcion para calcular digito
+0002d9 e073      		ldi rmp, 0x03				;Cargamos 1000
+0002da 2f67      		mov rBin2H,rmp
+0002db ee78      		ldi rmp, 0xE8
+0002dc 2f57      		mov rBin2L,rmp
+0002dd d00d      		rcall Bin2ToDigit			;Funcion para calcular digito
+0002de e070      		ldi rmp, 0x00				;Cargamos 100
+0002df 2f67      		mov rBin2H,rmp
+0002e0 e674      		ldi rmp, 0x64
+0002e1 2f57      		mov rBin2L,rmp
+0002e2 d008      		rcall Bin2ToDigit			;Funcion para calcular digito
+0002e3 e070      		ldi rmp, 0x00				;Cargamos 10
+0002e4 2f67      		mov rBin2H,rmp
+0002e5 e07a      		ldi rmp, 0x0A
+0002e6 2f57      		mov rBin2L,rmp
+0002e7 d003      		rcall Bin2ToDigit			;Funcion para calcular digito
+0002e8 82c0      		st z,ENTEROL
+0002e9 9734      		sbiw ZL,4					;Poner el puntero en el primer BCD
+0002ea 9508      		ret
                  
                  	Bin2ToDigit:
-0002ed 2777      		clr rmp						;Conteo en cero
+0002eb 2777      		clr rmp						;Conteo en cero
                  
                  	Bin2ToDigita:
-0002ee 16d6      		cp ENTEROH,rBin2H			; Comparo nro con comparacion parte alta
-0002ef f038      		brcs Bin2ToDigitc			; Si Carry=1 el nro es menor a comparacion, vuelve a rutina para comparar con un valor menor
-0002f0 f411      		brne Bin2ToDigitb	 
-0002f1 16c5      		cp ENTEROL,rBin2L			; Si es igual, Comparo nro con comparacion parte baja
-0002f2 f020      		brcs Bin2ToDigitc			; Si Carry=1 nro menor a comparacion
+0002ec 16d6      		cp ENTEROH,rBin2H			; Comparo nro con comparacion parte alta
+0002ed f038      		brcs Bin2ToDigitc			; Si Carry=1 el nro es menor a comparacion, vuelve a rutina para comparar con un valor menor
+0002ee f411      		brne Bin2ToDigitb	 
+0002ef 16c5      		cp ENTEROL,rBin2L			; Si es igual, Comparo nro con comparacion parte baja
+0002f0 f020      		brcs Bin2ToDigitc			; Si Carry=1 nro menor a comparacion
                  
                  	Bin2ToDigitb:			
-0002f3 1ac5      		sub ENTEROL,rBin2L			; Resto partes bajas
-0002f4 0ad6      		sbc ENTEROH,rBin2H			; Resto partes altas con carry
-0002f5 9573      		inc rmp						; Incremento cuenta para digito BCD
-0002f6 cff7      		rjmp Bin2ToDigita			; Repito el proceso hasta que sea menor a comparacion
+0002f1 1ac5      		sub ENTEROL,rBin2L			; Resto partes bajas
+0002f2 0ad6      		sbc ENTEROH,rBin2H			; Resto partes altas con carry
+0002f3 9573      		inc rmp						; Incremento cuenta para digito BCD
+0002f4 cff7      		rjmp Bin2ToDigita			; Repito el proceso hasta que sea menor a comparacion
                  
                  	Bin2ToDigitc:
-0002f7 9371      		st z+,rmp					; Salva el digito 
-0002f8 9508      		ret
+0002f5 9371      		st z+,rmp					; Salva el digito 
+0002f6 9508      		ret
                  
                  ;########################################################## MOSTRAR ENTERO #########################################################
                  	
                  	MOSTRAR:
                  		
-0002f9 940e 02cf 		call USART_ESPERA
-0002fb 91b1      		ld	r27, Z+					;Cargamos decena
-0002fc e3d0      		ldi r29, 48
-0002fd 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
-0002fe 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
-000300 940e 02cf 		call USART_ESPERA
+0002f7 940e 02cd 		call USART_ESPERA
+0002f9 91b1      		ld	r27, Z+					;Cargamos decena
+0002fa e3d0      		ldi r29, 48
+0002fb 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+0002fc 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
+0002fe 940e 02cd 		call USART_ESPERA
                  	
-000302 940e 02cf 		call USART_ESPERA
-000304 91b1      		ld	r27, Z+					;Cargamos unidad
-000305 e3d0      		ldi r29, 48
-000306 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
-000307 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
-000309 940e 02cf 		call USART_ESPERA
+000300 940e 02cd 		call USART_ESPERA
+000302 91b1      		ld	r27, Z+					;Cargamos unidad
+000303 e3d0      		ldi r29, 48
+000304 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+000305 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
+000307 940e 02cd 		call USART_ESPERA
                  
-00030b 940e 02cf 		call USART_ESPERA			
-00030d e24c      		ldi r20, 0x2C				; ,
-00030e 9340 00c6 		sts UDR0, r20				;Enviamos por puerto serie
+000309 940e 02cd 		call USART_ESPERA			
+00030b e24c      		ldi r20, 0x2C				; ,
+00030c 9340 00c6 		sts UDR0, r20				;Enviamos por puerto serie
                  
-000310 940e 02cf 		call USART_ESPERA
-000312 91b1      		ld	r27, Z+					;Cargamos primer decimal
-000313 e3d0      		ldi r29, 48
-000314 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
-000315 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
-000317 940e 02cf 		call USART_ESPERA
+00030e 940e 02cd 		call USART_ESPERA
+000310 91b1      		ld	r27, Z+					;Cargamos primer decimal
+000311 e3d0      		ldi r29, 48
+000312 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+000313 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
+000315 940e 02cd 		call USART_ESPERA
                  
-000319 940e 02cf 		call USART_ESPERA
-00031b 91b1      		ld	r27, Z+					;Cargamos segundo decimal
-00031c e3d0      		ldi r29, 48
-00031d 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
-00031e 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
-000320 940e 02cf 		call USART_ESPERA
+000317 940e 02cd 		call USART_ESPERA
+000319 91b1      		ld	r27, Z+					;Cargamos segundo decimal
+00031a e3d0      		ldi r29, 48
+00031b 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+00031c 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
+00031e 940e 02cd 		call USART_ESPERA
                  	
-000322 940e 02cf 		call USART_ESPERA
-000324 81b0      		ld	r27, Z					;Cargamos tercer decimal
-000325 e3d0      		ldi r29, 48
-000326 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
-000327 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
-000329 940e 02cf 		call USART_ESPERA
+000320 940e 02cd 		call USART_ESPERA
+000322 81b0      		ld	r27, Z					;Cargamos tercer decimal
+000323 e3d0      		ldi r29, 48
+000324 0fbd      		add r27, r29				;Sumamos 48 para convertirlo en ASCII
+000325 93b0 00c6 		sts UDR0,r27				;Enviamos por puerto serie
+000327 940e 02cd 		call USART_ESPERA
                  
-00032b 9734      		SBIW ZL, 4					;Poner el puntero en el primer BCD
-00032c 9508      		ret
+000329 9734      		SBIW ZL, 4					;Poner el puntero en el primer BCD
+00032a 9508      		ret
                  		
                  ;########################################################## USART COMPARACION #########################################################
                  
                  	USART_COMPARACION:
                  		
-00032d 9100 0111 		lds r16, DATO_RX			;Cargar dato recibido
-00032f e516      		ldi r17, 0x56				;Comparar con V
-000330 1301      		cpse r16, r17
-000331 c002      		rjmp I						;Si es falso, compara con I
-000332 940e 0263 		call MOSTRAR_TENSION		
+00032b 9100 0111 		lds r16, DATO_RX			;Cargar dato recibido
+00032d e516      		ldi r17, 0x56				;Comparar con V
+00032e 1301      		cpse r16, r17
+00032f c002      		rjmp I						;Si es falso, compara con I
+000330 940e 0261 		call MOSTRAR_TENSION		
                  		I:
-000334 e419      		ldi r17, 0x49				;Comparar con I
-000335 1301      		cpse r16, r17
-000336 c002      		rjmp P						;Si es falso, compara con P
-000337 940e 021b 		call MOSTRAR_CORRIENTE
+000332 e419      		ldi r17, 0x49				;Comparar con I
+000333 1301      		cpse r16, r17
+000334 c002      		rjmp P						;Si es falso, compara con P
+000335 940e 0219 		call MOSTRAR_CORRIENTE
                  		P:
-000339 e510      		ldi r17, 0x50				;Comparar con P
-00033a 1301      		cpse r16, r17
-00033b 9508      		ret
-00033c 940e 01d8 		call MOSTRAR_POTENCIA
-00033e 9508      		ret
+000337 e510      		ldi r17, 0x50				;Comparar con P
+000338 1301      		cpse r16, r17
+000339 9508      		ret
+00033a 940e 01d6 		call MOSTRAR_POTENCIA
+00033c 9508      		ret
+                 ;########################################################## INICIALIZAMOS DISPLAY #########################################################
+                 
+                 	SPI_MasterInicio:
+                 
+                 			;/////////////////////////////////////////// SETEAR BRILLO ////////////////////////////////////////////////////////
+                 					
+00033d e010      			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+00033e b915      			out PORTB, r17
+00033f 0000      			nop										;Cumplir tcss de hoja de datos MAX
+000340 e01a      			ldi r17, 0x0A
+000341 bd1e      			out SPDR, r17							;Entrar Set Brillo MAX
+000342 940e 038d 			call Esperar_TX							;Empezar la TX de información
+000344 0000      			nop
+000345 e010      			ldi r17, 0x00
+000346 bd1e      			out SPDR,r17							;Seteamos el brillo MAX al Minimo
+000347 940e 038d 			call Esperar_TX							;Empezar la TX de información
+000349 0000      			nop
+00034a e011      			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+00034b b915      			out PORTB, r17
+00034c 0000      			nop
+                 
+                 			;////////////////////////////////////// SETEAR MODOS ////////////////////////////////////////////////////////////
+                 
+00034d e010      			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+00034e b915      			out PORTB, r17
+00034f 0000      			nop
+000350 e019      			ldi r17, 0x09
+000351 bd1e      			out SPDR, r17							;Modo decodificacion MAX7219
+000352 940e 038d 			call Esperar_TX							;Empezar la TX de información
+000354 0000      			nop
+000355 e01f      			ldi r17, 0x0F
+000356 bd1e      			out SPDR, r17							;Decodificar los digitos del 0 - 3
+000357 940e 038d 			call Esperar_TX							;Empezar la TX de información
+000359 0000      			nop
+00035a e011      			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+00035b b915      			out PORTB, r17
+00035c 0000      			nop
+                 
+                 			;/////////////////////////////////////////// CANTIDAD DE DIGITOS /////////////////////////////////////////////////////////////////////
+                 
+00035d e010      			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+00035e b915      			out PORTB, r17
+00035f e01b      			ldi r17, 0x0B
+000360 bd1e      			out SPDR,r17							;Set SCAN Limit
+000361 940e 038d 			call Esperar_TX							;Empezar la TX de información
+000363 0000      			nop
+000364 e015      			ldi r17, 0x05
+000365 bd1e      			out SPDR,r17							;Mostrar 6 digitos
+000366 940e 038d 			call Esperar_TX							;Empezar la TX de información
+000368 0000      			nop
+000369 e011      			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+00036a b915      			out PORTB, r17
+00036b 0000      			nop
+                 
+00036c e010      			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+00036d b915      			out PORTB, r17
+00036e e01c      			ldi r17, 0x0C
+00036f bd1e      			out SPDR,r17							;Set de MODO
+000370 940e 038d 			call Esperar_TX							;Modo Normal 
+000372 0000      			nop
+000373 e011      			ldi r17, 0x01
+000374 bd1e      			out SPDR,r17							;MODO Normal
+000375 940e 038d 			call Esperar_TX							;Empezar la TX de información
+000377 0000      			nop
+000378 e011      			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+000379 b915      			out PORTB, r17
+00037a 0000      			nop
+                 
+00037b e010      			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+00037c b915      			out PORTB, r17
+00037d e01f      			ldi r17, 0x0F
+00037e bd1e      			out SPDR,r17							;Menu Modo TEST
+00037f 940e 038d 			call Esperar_TX							;Modo normal (No TEST)
+000381 0000      			nop
+000382 0000      			nop
+000383 e010      			ldi r17, 0x00
+000384 bd1e      			out SPDR,r17							;Modo Operacion Normal
+000385 940e 038d 			call Esperar_TX							;Empezar la TX de información
+000387 0000      			nop
+000388 0000      			nop
+000389 e011      			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+00038a b915      			out PORTB, r17
+00038b 0000      			nop
+                 
+                 			;////////////////////////////////INICIO DISPLAY TODOS LOS DIGITOS OFF //////////////////////////////////////////////////////////
+                 
+                 			/*ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+                 			out PORTB, r17
+                 			ldi r17, 0x01
+                 			out SPDR,r17							;Digit 0
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, 0x0F
+                 			out SPDR,r17							
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+                 			out PORTB, r17
+                 			nop
+                 			nop
+                 
+                 			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+                 			out PORTB, r17
+                 			ldi r17, 0x02
+                 			out SPDR,r17							;Digit1
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, 0x0F
+                 			out SPDR,r17							
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+                 			out PORTB, r17
+                 			nop
+                 			nop
+                 
+                 			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+                 			out PORTB, r17
+                 			ldi r17, 0x03
+                 			out SPDR,r17							;Digit 2
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, 0x0F
+                 			out SPDR,r17							
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+                 			out PORTB, r17
+                 			nop
+                 			nop
+                 
+                 			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+                 			out PORTB, r17
+                 			ldi r17, 0x04
+                 			out SPDR,r17							;Digit 3
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, 0x0F
+                 			out SPDR,r17							
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+                 			out PORTB, r17
+                 			nop
+                 			nop
+                 
+                 			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+                 			out PORTB, r17
+                 			ldi r17, 0x05
+                 			out SPDR,r17							;Digit 4
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, 0x00
+                 			out SPDR,r17							
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+                 			out PORTB, r17
+                 			nop
+                 			nop
+                 
+                 			ldi r17, (0<<PORTB0)					;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+                 			out PORTB, r17
+                 			ldi r17, 0x06
+                 			out SPDR,r17							;Digit 5
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, 0x00
+                 			out SPDR,r17							
+                 			call Esperar_TX							
+                 			nop
+                 			nop
+                 			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+                 			out PORTB, r17
+                 			nop
+                 			nop*/
+                 
+00038c 9508      			ret
+                 
+                 	Esperar_TX:	
+00038d b5ad      			in r26, SPSR		
+00038e ffa7      			sbrs r26, SPIF							; Esperar que se complete la transmisión
+00038f cffd      			rjmp Esperar_TX
+                 			
+000390 9508      			ret
+                 
+                 	MOSTRAR_TENSION_MAX:
+                 			
+000391 e010      			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+000392 b915      			out PORTB, r17
+000393 0000      			nop
+000394 e016      			ldi r17, 0x06
+000395 bd1e      			out SPDR, r17							;Digito 6
+000396 940e 038d 			call Esperar_TX							;Empezar la TX de información
+000398 0000      			nop
+                 
+000399 e010      			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+00039a b915      			out PORTB, r17
+00039b 0000      			nop
+00039c e31e      			ldi r17, 0b0011_1110			;Enviamos letra "U"
+00039d bd1e      			out SPDR, r17						
+00039e 940e 038d 			call Esperar_TX							;Empezar la TX de información
+0003a0 0000      			nop
+                 
+0003a1 e010      			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+0003a2 b915      			out PORTB, r17
+0003a3 0000      			nop
+0003a4 e015      			ldi r17, 0x05
+0003a5 bd1e      			out SPDR, r17							;Digito 5
+0003a6 940e 038d 			call Esperar_TX							;Empezar la TX de información
+0003a8 0000      			nop
+                 
+0003a9 e010      			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+0003aa b915      			out PORTB, r17
+0003ab 0000      			nop
+0003ac e019      			ldi r17, 0b0000_1001			;Enviamos signo "="
+0003ad bd1e      			out SPDR, r17						
+0003ae 940e 038d 			call Esperar_TX							;Empezar la TX de información
+0003b0 0000      			nop
+                 
+0003b1 940e 02d2 			call DESCOMPOSICION
+0003b3 940e 03b5 			call TRANSMITIR_MAX
+                 
+                 	TRANSMITIR_MAX:
+                 			
+                 		; parte alta decimal
+                 
+0003b5 e010      		ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+0003b6 b915      		out PORTB, r17
+0003b7 0000      		nop
+0003b8 e014      		ldi r17, 0x04
+0003b9 bd1e      		out SPDR, r17							;Digito entero alto
+0003ba 940e 038d 		call Esperar_TX							;Empezar la TX de información
+0003bc 0000      		nop
+                 
+0003bd 9111      		ld	r17, Z+								; Decena de mil
+                 
+0003be bd1e      		out SPDR, r17							;Envio digito entero alto
+0003bf 940e 038d 		call Esperar_TX							;Empezar la TX de información
+0003c1 0000      		nop
+0003c2 e011      		ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+0003c3 b915      		out PORTB, r17
+0003c4 0000      		nop
+                 
+                 		;entero bajo
+                 
+0003c5 e010      		ldi r17, (0<<PORTB0)				;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+0003c6 b915      		out PORTB, r17
+0003c7 0000      		nop
+0003c8 e013      		ldi r17, 0x03
+0003c9 bd1e      		out SPDR, r17							;Digito Unidad de MIl
+0003ca 940e 038d 		call Esperar_TX							;Empezar la TX de información
+0003cc 0000      		nop
+                 	
+0003cd 9111      		ld	r17, Z+								; Unidad de MIl
+0003ce ef00      		ldi r16, 0xF0
+0003cf 0f10      		add r17, r16							; suma para mostrar puntto decima
+0003d0 bd1e      		out SPDR, r17							;Envio Unidad de Mil
+0003d1 940e 038d 		call Esperar_TX							;Empezar la TX de información
+0003d3 0000      		nop
+0003d4 e011      		ldi r17, (1<<PORTB0)						;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+0003d5 b915      		out PORTB, r17
+0003d6 0000      		nop
+                 
+                 
+                 		; primer decimal
+                 
+0003d7 e010      		ldi r17, (0<<PORTB0)				;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+0003d8 b915      		out PORTB, r17
+0003d9 0000      		nop
+0003da e012      		ldi r17, 0x02
+0003db bd1e      		out SPDR, r17							;Digito Centena
+0003dc 940e 038d 		call Esperar_TX							;Empezar la TX de información
+0003de 0000      		nop
+                 
+0003df 9111      		ld	r17, Z+								; primer decimal
+                 
+0003e0 bd1e      		out SPDR, r17							;Envio Centena
+0003e1 940e 038d 		call Esperar_TX							;Empezar la TX de información
+0003e3 0000      		nop
+0003e4 e011      		ldi r17, (1<<PORTB0)				;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+0003e5 b915      		out PORTB, r17
+0003e6 0000      		nop
+                 
+                 		; ultimo decimal
+                 
+0003e7 e010      		ldi r17, (0<<PORTB0)				;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+0003e8 b915      		out PORTB, r17
+0003e9 0000      		nop
+0003ea e011      		ldi r17, 0x1
+0003eb bd1e      		out SPDR, r17							;Digito Decena
+0003ec 940e 038d 		call Esperar_TX							;Empezar la TX de información
+0003ee 0000      		nop
+                 
+0003ef 9111      		ld	r17, Z+; Decena
+                 
+0003f0 bd1e      		out SPDR, r17							;Envio Decena
+0003f1 940e 038d 		call Esperar_TX							;Empezar la TX de información
+0003f3 0000      		nop
+0003f4 e011      		ldi r17, (1<<PORTB0)				;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+0003f5 b915      		out PORTB, r17
+0003f6 0000      		nop
+                 		
+0003f7 9734      		SBIW ZL, 4
+0003f8 2711      		clr r17
+                 
+0003f9 9508      		ret
 
 
 RESOURCE USE INFORMATION
@@ -1887,37 +2213,37 @@ counted separately from r26..r31 here.
 "ATmega328P" register use summary:
 r0 :   7 r1 :   4 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:  12 r13:  23 r14:  14 r15:  14 
-r16:  76 r17:  43 r18:  38 r19:  27 r20:  93 r21:  26 r22:  24 r23:  37 
-r24:   8 r25:   8 r26:   8 r27:  21 r28:   0 r29:  10 r30:   3 r31:   1 
-x  :   0 y  :   0 z  :   7 
+r16:  78 r17: 135 r18:  38 r19:  27 r20:  93 r21:  26 r22:  24 r23:  37 
+r24:   8 r25:   8 r26:  10 r27:  21 r28:   0 r29:  10 r30:   4 r31:   1 
+x  :   0 y  :   0 z  :  11 
 Registers used: 22 out of 35 (62.9%)
 
 "ATmega328P" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   8 add   :  15 adiw  :   0 and   :   0 
+.lds  :   0 .sts  :   0 adc   :   8 add   :  16 adiw  :   0 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
 brcc  :   1 brcs  :   2 break :   0 breq  :   0 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
 brne  :   2 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :  77 cbi   :   0 cbr   :   0 
-clc   :   1 clh   :   0 cli   :   0 cln   :   0 clr   :   5 cls   :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  : 100 cbi   :   0 cbr   :   0 
+clc   :   1 clh   :   0 cli   :   0 cln   :   0 clr   :   6 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   2 cpc   :   0 
 cpi   :   0 cpse  :   3 dec   :   1 eor   :   0 fmul  :   0 fmuls :   0 
-fmulsu:   0 icall :   0 ijmp  :   0 in    :   3 inc   :   1 jmp   :   5 
-ld    :   5 ldd   :   0 ldi   : 105 lds   :  48 lpm   :   0 lsl   :   0 
+fmulsu:   0 icall :   0 ijmp  :   0 in    :   4 inc   :   1 jmp   :   5 
+ld    :   9 ldd   :   0 ldi   : 147 lds   :  48 lpm   :   0 lsl   :   0 
 lsr   :   0 mov   :  13 movw  :   2 mul   :   7 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   9 pop   :  51 
-push  :  51 rcall :   4 ret   :  17 reti  :   4 rjmp  :   8 rol   :   4 
-ror   :   0 sbc   :   2 sbci  :   0 sbi   :   0 sbic  :   3 sbis  :   0 
-sbiw  :   2 sbr   :   0 sbrc  :   2 sbrs  :   1 sec   :   1 seh   :   0 
+neg   :   0 nop   :  43 or    :   0 ori   :   0 out   :  54 pop   :  51 
+push  :  51 rcall :   4 ret   :  20 reti  :   4 rjmp  :   9 rol   :   4 
+ror   :   0 sbc   :   2 sbci  :   0 sbi   :   0 sbic  :   1 sbis  :   0 
+sbiw  :   3 sbr   :   0 sbrc  :   2 sbrs  :   2 sec   :   1 seh   :   0 
 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
 sez   :   0 sleep :   0 spm   :   0 st    :   2 std   :   0 sts   :  93 
 sub   :   3 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 38 out of 113 (33.6%)
+Instructions used: 39 out of 113 (34.5%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x00067e   1574      0   1574   32768   4.8%
+[.cseg] 0x000000 0x0007f4   1948      0   1948   32768   5.9%
 [.dseg] 0x000100 0x000117      0     23     23    2048   1.1%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 
