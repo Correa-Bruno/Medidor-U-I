@@ -2,31 +2,31 @@
  * MULTIMEDIDOR DE CC
  *
  * 
- *   Author: De Battista Cristian y Errecart Matias
- *	 Oyente por Zoom: Correa Bruno, Alias "el arruinau"
+ *   Autores: Correa Bruno, De Battista Cristian, Errecart Matias
+ *	 
  */ 
  ;########################################################################################################################################## 
  ;############################################################### DECLARACION ##############################################################
  ;##########################################################################################################################################
 
-.def	ENTEROL=r12				;Subrutina mostrar
-.def	ENTEROH=r13				;Subrutina mostrar
-.def	RestoL=r14				;Subrutina division
-.def	RestoH=r15				;Subrutina division
-.def	DividendoL=r16			;Subrutina division
-.def	DividendoH=r17			;Subrutina division
-.def	DivisorL=r18			;Subrutina division
-.def	DivisorH=r19			;Subrutina division
-.def	Contador=r20			;Subrutina division
-.def	rBin2L=r21				;Subrutina descomposicion
-.def	rBin2H=r22				;Subrutina descomposicion
-.def	rmp=r23					;Subrutina descomposicion
+.def	ENTEROL=r12					;Subrutina mostrar
+.def	ENTEROH=r13					;Subrutina mostrar
+.def	RestoL=r14					;Subrutina division
+.def	RestoH=r15					;Subrutina division
+.def	DividendoL=r16				;Subrutina division
+.def	DividendoH=r17				;Subrutina division
+.def	DivisorL=r18				;Subrutina division
+.def	DivisorH=r19				;Subrutina division
+.def	Contador=r20				;Subrutina division
+.def	rBin2L=r21					;Subrutina descomposicion
+.def	rBin2H=r22					;Subrutina descomposicion
+.def	rmp=r23						;Subrutina descomposicion
 
-.MACRO	PUSH_SREG				;Guardo en la pila la posicion de memoria
-		push r13
-		in r13, SREG			;guardar registro de tranjo 12 tmb 
-		push r13
+.MACRO	PUSH_SREG					;Guardar en la pila la posicion de memoria
 		push r12
+		in r12, SREG			
+		push r12					;Guardar registros de trabajo
+		push r13
 		push r14
 		push r15
 		push r16
@@ -58,10 +58,10 @@
 		pop r16
 		pop r15
 		pop r14
+		pop r13
 		pop r12
-		pop r13
-		out sreg, r13				;recupero de la pila la posicion de memoria
-		pop r13
+		out sreg, r12				;Recuperar de la pila la posicion de memoria
+		pop r12
 .ENDMACRO
 
 .DSEG
@@ -111,39 +111,39 @@
 
 	INICIO:
 
-		ldi r16, high(ramend)  ;conf pila
+		ldi r16, high(ramend)		;Configuracion de pila
 		out sph, r16
 		ldi r16, low(ramend)
 		out spl, r16
 
 ;########################################################## CONFIGURACION ADC #########################################################
 
-		ldi r16, (1<<ADC1D)|(1<<ADC0D)	;descativo entrada digital de los pines ADC0 y ADC1
-		sts DIDR0, r16
+		ldi r16, (1<<ADC1D)|(1<<ADC0D)	
+		sts DIDR0, r16				;Descativo entrada digital de los pines ADC0 y ADC1
 
 ;########################################################## CONFIGURACION  de PINES y PCINT0 #########################################################
 
-		ldi r16, (0<<PD7)|(0<<PD6)|(0<<PD5)				;pines como entrada interrupcion de PCIE2
-		out DDRD,r16
-		ldi r16, (1<<PORTD7)|(1<<PORTD6)|(1<<PORTD5)	;Resistencias Pull Up
-		out PORTD, r16
-		ldi r16, (1<<PCIE2)								;habilito int por cambio de pines[7:0] (PCIE2)
+		ldi r16, (0<<DDD7)|(0<<DDD6)|(0<<DDD5)			
+		out DDRD,r16				;Pines como entrada interrupcion de PCIE2
+		ldi r16, (1<<PD7)|(1<<PD6)|(1<<PD5)				
+		out PORTD, r16				;Resistencias Pull Up
+		ldi r16, (1<<PCIE2)			;Habilito int por cambio de pines[7:0] (PCIE2)
 		sts PCICR, r16
-		ldi r16, 0b1110_0000							;habilito los pines 7-6-5 de interrupcion (PCINT 23 - 22 - 21)
+		ldi r16, 0b1110_0000		;Habilito los pines 7-6-5 de interrupcion (PCINT 23 - 22 - 21)
 		sts PCMSK2, r16
-
-		ldi r16, (1<<PB0)|(1<<PB1)|(1<<PB2)|(1<<PB5)|(1<<PB3)	;como salida PB1-9(OC1A), PB2-10(OC1B)|| PB5-13(CSK), PB3-11(MOSI), PB0-8(CS)
-		out DDRB, r16
-
+		ldi r16, (1<<DDB1)|(1<<DDB2)|(1<<DDB3)|(1<<DDB5)	
+		out DDRB, r16				;Como salida PB1-9(OC1A), PB2-10(OC1B)|| PB5-13(CSK), PB3-11(MOSI)
+		ldi r16, (1<<DDC5)			;Pin PC5-A5 (Load) como salida
+		out DDRC, r16
 
 ;########################################################## CONFIGURACION DE TIMER/COMP 1 #########################################################
 		
-		ldi r16, (1<<COM1A1)|(0<<COM1A0)|(1<<COM1B1)|(0<<COM1B0)|(1<<WGM11)|(1<<WGM10) ; modo fase correcta PWM, comparacion igual no invertido, resolucion 10-bit
-		sts TCCR1A, r16
-		ldi r16, (1<<WGM12)|(0<<WGM13)|(0<<CS12)|(1<<CS11)|(0<<CS10)  ;selector de reloj de timer/counter: Clock_I-O/8(from prescaler)
-		sts TCCR1B, r16
+		ldi r16, (1<<COM1A1)|(0<<COM1A0)|(1<<COM1B1)|(0<<COM1B0)|(1<<WGM11)|(1<<WGM10) 
+		sts TCCR1A, r16				;Modo fase correcta PWM, comparacion igual no invertido, resolucion 10-bit
+		ldi r16, (1<<WGM12)|(0<<WGM13)|(0<<CS12)|(1<<CS11)|(0<<CS10)  
+		sts TCCR1B, r16				;Selector de reloj de timer/counter: Clock_I-O/8(from prescaler)
 
-		ldi r16, (1<<TOIE1)								;interrupcion de salida del temporizador/contador  
+		ldi r16, (1<<TOIE1)			;Interrupcion de salida del temporizador/contador  
 		sts TIMSK1, r16
 		
 		ldi r16, 0x00
@@ -154,28 +154,22 @@
 
 ;########################################################## CONFIGURACION DE USART #########################################################
 
-		ldi r16, 103								;Velocidad de transmicion 9600 Bd
+		ldi r16, 103				;Velocidad de transmicion 9600 Bd
 		ldi r17, 0
 		sts UBRR0H, r17
 		sts UBRR0L, r16
 
-		ldi r16, (1<<RXCIE0)|(1<<RXEN0)|(1<<TXEN0)	;Habilita interrupción por recepción, Habilita recepción, Habilita transmición
-		sts UCSR0B, r16
+		ldi r16, (1<<RXCIE0)|(1<<RXEN0)|(1<<TXEN0)	
+		sts UCSR0B, r16				;Habilita interrupción por recepción, Habilita recepción, Habilita transmición
 			
-		ldi r16, (0<<USBS0)|(1<<UCSZ01)|(1<<UCSZ00)	;Stop Bit 1, 8 bits
-		sts UCSR0C, r16								
+		ldi r16, (0<<USBS0)|(1<<UCSZ01)|(1<<UCSZ00)	
+		sts UCSR0C, r16				;Stop Bit 1, 8 bits				
 
-;##########################################################  CONFIGURACION SPI Modo - MAESTRO ######################################################### 
-		
-		ldi r17,(1<<SPE)|(1<<MSTR)|(1<<SPR0)	; Habilitar SPI como Master, frecuencia SCK (1Mhz)
-		out SPCR,r17
-		
-		ldi r16, (1<<PORTB0)			;Configuramos pull up PB0 - pin 8 - CS (chip select)
-		out PORTB, r16
-		
-		call SPI_MasterInicio		;Subrutina para inicio de SPI
+;########################################################## CONFIGURACION DEL MAX #########################################################
 
-		SEI							; Habilitacion global de interrupciones				
+		call CONFIG_MAX				;Inicializar MAX
+
+		sei							;Habilitacion global de interrupciones				
 
 ;################################################################################################################################## 
 ;############################################################# PROGRAMA ###########################################################
@@ -183,70 +177,261 @@
 
 ;########################################################## BUCLE PRINCIPAL #########################################################
 		
-		BUCLE:
-			call ADC0
-			call ADC1
-			call CALCULO_TENSION
-			call CALCULO_CORRIENTE
-			call USART_COMPARACION
-			jmp BUCLE
+	BUCLE:
+		call ADC0
+		call ADC1
+		call CALCULO_TENSION
+		call CALCULO_CORRIENTE
+		call CALCULO_POTENCIA
+		call USART_COMPARACION
+		jmp BUCLE
 
 ;########################################################## TRATAMIENTO DE INTERRUPCION DEL TIMER1 (salidas PWM 1-5 V) #########################################################
 
-		RTI_TIMER1_OVF:			
-			PUSH_SREG						;guardo en la pila la posicion de memoria
+	RTI_TIMER1_OVF:			
+		PUSH_SREG					;Guardo en la pila la posicion de memoria
 								
-			lds r21, VAL_TensionADCH
-			sts OCR1AH, r21					;salida PWMA timer OC1A
-			lds r21, VAL_TensionADCL	
-			sts OCR1AL, r21
+		lds r21, VAL_TensionADCH
+		sts OCR1AH, r21				;Salida PWMA timer OC1A
+		lds r21, VAL_TensionADCL	
+		sts OCR1AL, r21
 			
-			lds r20, VAL_CorrienteADCH
-			sts OCR1BH, r20					;salida PWMB timer OC1B
-			lds r20, VAL_CorrienteADCL	
-			sts OCR1BL, r20
+		lds r20, VAL_CorrienteADCH
+		sts OCR1BH, r20				;Salida PWMB timer OC1B
+		lds r20, VAL_CorrienteADCL	
+		sts OCR1BL, r20
 			
-			POP_SREG					;recupero el valor de la pila
-			reti
+		POP_SREG					;Recupero el valor de la pila
+		reti
 
+;########################################################## CONFIGURACION SPI Modo - MAESTRO ######################################################### 
+
+	CONFIG_MAX:
+
+		ldi r17,(1<<SPE)|(1<<MSTR)|(1<<SPR0)	
+		out SPCR,r17				;Habilitar SPI como Master, Velocidad de reloj f/16 (1Mhz)
+			
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SETEAR BRILLO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+					
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x0A
+		out SPDR, r17				;Entrar Set Brillo MAX
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0x00
+		out SPDR,r17				;Setear el brillo MAX al Minimo
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SETEAR MODOS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x09
+		out SPDR, r17				;Entrar en modo de codificacion
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0x0F
+		out SPDR,r17				;Setear Code B decode for digits 3–0 No decode for digits 7–4
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SCAN LIMIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x0B
+		out SPDR, r17				;Entrar Scan Limit
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0x05
+		out SPDR,r17				;Display digits 0 1 2 3 4 5
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setear Modo ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x0C
+		out SPDR, r17				;Entrar MODO
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 1
+		out SPDR,r17				;Normal Operation
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Setear TEST ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x0F
+		out SPDR, r17				;Entrar TEST
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0
+		out SPDR,r17				;Normal Operation
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Iniciar digitos en "HELLO" ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+		ldi r17, (0<<PC5)			;Mando 0 a PB4 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x01
+		out SPDR, r17				;Digito 0
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0x00
+		out SPDR,r17				;O
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x02
+		out SPDR, r17				;Digito 1
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0x0D
+		out SPDR,r17				;L
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x03
+		out SPDR, r17				;Digito 2
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0x0D
+		out SPDR,r17				;L
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x04
+		out SPDR, r17				;Digito 3
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0x0B
+		out SPDR,r17				;E
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x05
+		out SPDR, r17				;Digito 4
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0x37
+		out SPDR,r17				;H
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x06
+		out SPDR, r17				;Digito 5
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0x00
+		out SPDR,r17				;0
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+		ret
+		
 ;########################################################## INTERRUPCION POR PCINT0 #########################################################
 
-		RTI_SELECT:
-			PUSH_SREG
+	RTI_SELECT:
+		PUSH_SREG
 
-			/*sbic PIND, PIND7				;Pregunta si PD7 esta en 0
-			call MOSTRAR_POTENCIA			;Llama funcion para mostrar potencia
-			sbic PIND, PIND6				;Pregunta si PD6 esta en 0
-			call MOSTRAR_CORRIENTE	*/		;Llama funcion para mostrar corriente
-			sbic PIND, PIND5				;Pregunta si PD5 esta en 0
-			call MOSTRAR_TENSION_MAX			;Llama funcion para mostrar tension
+		in r16, PIND
+		sbrs r16, 7					;Pregunta si PD7 esta en 0
+		call MOSTRAR_POTENCIA_MAX	;Llama funcion para mostrar potencia
+		sbrs r16, 6					;Pregunta si PD6 esta en 0
+		call MOSTRAR_CORRIENTE_MAX	;Llama funcion para mostrar potencia
+		sbrs r16, 5					;Pregunta si PD5 esta en 0
+		call MOSTRAR_TENSION_MAX	;Llama funcion para mostrar tension
 			
-			POP_SREG
-			reti
+		POP_SREG
+		reti
 
 ;########################################################## SUBRUTINA PARA LEER ADC0 ###################################################################
 	
 	ADC0:
 
-			// *** Configuramos ADMUX ***
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Configuracion ADEMUX ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 		ldi r16, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(0<<MUX0) 
-		sts ADMUX, r16  
-			; Referencia de Voltaje Con AVCC y Capacitor. Activamos ADC, Canal ADC0    
+		sts ADMUX, r16				;Referencia de Voltaje Con AVCC y Capacitor, Activar ADC, Canal ADC0  
+		
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Iniciar conversion ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-		// *** Iniciamos conversión en ADC0 *** 
-		ldi r16, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
-		sts ADCSRA, r16 
-		ldi r16, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
-		sts ADCSRB, r16
+		ldi r16, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) 
+		sts ADCSRA, r16				;Prescaler en 8, Habilito ADC, Int de conversion completa(ADIE), Activacion auto del ADC(ADATE)
+		ldi r16, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	
+		sts ADCSRB, r16				;Timer/Counter1 Overflow
 
-		adcLeerADC0:
-		lds r16, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
-		SBRC r16, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
-		rjmp adcLeerADC0 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Leer ADC1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	LEER_ADC0:
+
+		lds r16, ADCSRA				;Cargar el control ADCSRA
+		SBRC r16, 6					;Saltar si se completo la conversion ADCS = 0
+		rjmp LEER_ADC0 
 			
-		lds r17, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
-		lds r16, ADCH  ; Cargamos parte alta del ADC en el registro 16.
-		sts VAL_CorrienteADCL, r17 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
+		lds r17, ADCL				;Cargar parte baja del ADC
+		lds r16, ADCH				;Cargar parte alta del ADC
+		sts VAL_CorrienteADCL, r17	;Guardar el valor de ADC en VAL_CorrienteADC
 		sts VAL_CorrienteADCH, r16
 	
 		ret
@@ -255,56 +440,61 @@
 
 	ADC1:
 
-			// *** Configuramos ADMUX ***
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Configuracion ADEMUX ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 		ldi r18, (0<<REFS1)|(1<<REFS0)|(0<<ADLAR)|(0<<MUX3)|(0<<MUX2)|(0<<MUX1)|(1<<MUX0) 
-		sts ADMUX, r18  
-			; Referencia de Voltaje Con AVCC y Capacitor. Activamos ADC, Canal ADC0    
+		sts ADMUX, r18				;Referencia de Voltaje Con AVCC y Capacitor, Activar ADC, Canal ADC1    
 
-		// *** Iniciamos conversión en ADC0 *** 
-		ldi r18, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) ;prescaler en 8, habilito ADC, int de conversion completa(ADIE), activacion auto del ADC(ADATE)  
-		sts ADCSRA, r18 
-		ldi r18, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	;Timer/Counter1 Overflow
-		sts ADCSRB, r18
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Iniciar conversion ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-		adcLeerADC1:
-		lds r18, ADCSRA  ;Carga el control ADC y rgistro de estado A en el registro 16
-		SBRC r18, 6      ;Salta si el bit 6 en el  registro r16 es limpiado
-		rjmp adcLeerADC1 
+		ldi r18, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) 
+		sts ADCSRA, r18				;Prescaler en 8, Habilito ADC, Int de conversion completa(ADIE), Activacion auto del ADC(ADATE)  
+		ldi r18, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	
+		sts ADCSRB, r18				;Timer/Counter1 Overflow
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Leer ADC1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	LEER_ADC1:
+
+		lds r18, ADCSRA				;Cargar el control ADCSRA
+		sbrc r18, 6					;Saltar si se completo la conversion ADCS = 0
+		rjmp LEER_ADC1 
 			
-		lds r18, ADCL  ; Cargamos parte baja del ADC pero no la guardamos.
-		lds r19, ADCH  ; Cargamos parte alta del ADC en el registro 16.
-		sts VAL_TensionADCL, r18 ; Cargamos el valor de ADCH en SRAM (a variable ValPotA)
+		lds r18, ADCL				;Cargar parte baja del ADC
+		lds r19, ADCH				;Cargar parte alta del ADC
+		sts VAL_TensionADCL, r18	;Guardar el valor de ADC en VAL_TensionADC
 		sts VAL_TensionADCH, r19
 	
 		ret	
+
 ;################################################################### CALCULO DE TENSION ###################################################################
 	
 	CALCULO_TENSION:
 		
 		lds R23, VAL_TensionADCH
-		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
+		lds R22, VAL_TensionADCL	;Carga el numero VAL_Tension en r23:r22
 		ldi R21,0x00
-		ldi R20,0x18						;Carga el numero 24 r21:r20
-		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
-		sts GRANDEH, r17					;Guardamos resultado de la primer multiplicacion
+		ldi R20,0x18				;Carga el numero 24 r21:r20
+		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
+		sts GRANDEH, r17			;Guardamos resultado de la primer multiplicacion
 		sts GRANDEL, r16
 
 		lds R23, VAL_TensionADCH
-		lds R22, VAL_TensionADCL			;Carga el numero VAL_Tension en r23:r22
+		lds R22, VAL_TensionADCL	;Carga el numero VAL_Tension en r23:r22
 		ldi R21,0x00
-		ldi R20,0x2B						;Carga el numero 43 r21:r20
-		call mul16x16_16					;Llamado a rutina de multiplicacion de 16 bits x 16 bits
+		ldi R20,0x2B				;Carga el numero 43 r21:r20
+		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 	
-		ldi	DivisorL,0x64					;El dividendo ya esta en r16 y r17
-		ldi	DivisorH,0x00					;Dividimos por 100
+		ldi	DivisorL,0x64			;El dividendo ya esta en r16 y r17
+		ldi	DivisorH,0x00			;Dividimos por 100
 		call Division16_16
 
 		lds r19, GRANDEH
 		lds r18, GRANDEL
 
-		add r19, DividendoH					;Sumamos primer calculo con segundo calculo
+		add r19, DividendoH			;Sumamos primer calculo con segundo calculo
 		adc r18, DividendoL
-		sts	TensionH, r19					;Valor de la tension real
+		sts	TensionH, r19			;Valor de la tension real
 		sts	TensionL, r18
 		ret
 
@@ -312,22 +502,22 @@
  
 	CALCULO_CORRIENTE:
 
-		lds r23, VAL_CorrienteADCH			;Carga valores del ADC
+		lds r23, VAL_CorrienteADCH	;Carga valores del ADC
 		lds r22, VAL_CorrienteADCL
-		ldi r24, 0x01						;Carga complemento de 511 para restar
+		ldi r24, 0x01				;Carga complemento de 511 para restar
 		ldi r25, 0xFE
-		add r22, r24						;Realiza suma (resta)
+		add r22, r24				;Realiza suma (resta)
 		adc r23, r25
-		ldi r23, 0x00						;Ponemos 0 en la parte alta del resultado
-		ldi r21, 0x02						;Carga 587 (factor para adecuar la medicion) para multiplicar
+		ldi r23, 0x00				;Ponemos 0 en la parte alta del resultado
+		ldi r21, 0x02				;Carga 587 (factor para adecuar la medicion) para multiplicar
 		ldi r20, 0x4B
-		call mul16x16_16					;Llama funcion multiplicacion
+		call mul16x16_16			;Llama funcion multiplicacion
 
-		ldi DivisorH, 0x00					;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
+		ldi DivisorH, 0x00			;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
 		ldi DivisorL, 0x0A
-		call Division16_16					;Llama funcion division
+		call Division16_16			;Llama funcion division
 
-		sts CorrienteH, r17					;Resultado corriente
+		sts CorrienteH, r17			;Resultado corriente
 		sts CorrienteL, r16				
 		ret
 
@@ -335,80 +525,80 @@
  
 	CALCULO_POTENCIA:
 
-		lds r23, CorrienteH					;Cargar valor de corriente
-		lds r22, CorrienteL
-		lds DividendoH, TensionH			;Cargar valor de tension
+		lds DividendoH, TensionH	;Cargar valor de tension
 		lds DividendoL, TensionL
-		ldi DivisorH, 0x03					;Cargar 1000 en divisor
+		ldi DivisorH, 0x03			;Cargar 1000 en divisor
 		ldi DivisorL, 0xE8
-		call Division16_16					;Llamar funcion division
-		sts GRANDEH, r17					;Guardar resultado
+		call Division16_16			;Llamar funcion division
+		sts GRANDEH, r17			;Guardar resultado
 		sts GRANDEL, r16
 
-		mov DividendoH, RestoH				;Cargar resto para dividir
+		mov DividendoH, RestoH		;Cargar resto para dividir
 		mov DividendoL, RestoL
-		ldi DivisorH, 0x00					;Cargar 100 en divisor
+		ldi DivisorH, 0x00			;Cargar 100 en divisor
 		ldi DivisorL, 0x64
-		call Division16_16					;Llamar funcion division		
-		sts Temp1, r16						;Guardar resultado (primer decimal)
+		call Division16_16			;Llamar funcion division		
+		sts Temp1, r16				;Guardar resultado (primer decimal)
 
-		mov DividendoH, RestoH				;Cargar resto para dividir
+		mov DividendoH, RestoH		;Cargar resto para dividir
 		mov DividendoL, RestoL
-		ldi DivisorH, 0x00					;Cargar 10 en divisor
+		ldi DivisorH, 0x00			;Cargar 10 en divisor
 		ldi DivisorL, 0x0A
-		call Division16_16					;Llamar funcion division
-		sts Temp2, r16						;Guardar resultado (segundo decimal)
-		sts Temp3, RestoL					;Guardar resto (tercer decimal)
+		call Division16_16			;Llamar funcion division
+		sts Temp2, r16				;Guardar resultado (segundo decimal)
+		sts Temp3, RestoL			;Guardar resto (tercer decimal)
 
-		lds r21, GRANDEH
+		lds r23, CorrienteH			;Cargar valor de corriente
+		lds r22, CorrienteL
+		lds r21, GRANDEH			;Cargar valor entero de tension
 		lds r20, GRANDEL
-		call mul16x16_16					;Llamar funcion multiplicacion
-		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+		call mul16x16_16			;Llamar funcion multiplicacion
+		sts PotenciaH, r17			;Guardar resultado temporal de la potencia
 		sts PotenciaL, r16
 
-		lds r23, CorrienteH					;Cargar valor de corriente
+		lds r23, CorrienteH			;Cargar valor de corriente
 		lds r22, CorrienteL
-		ldi r21, 0x00						;Cargar valor del primer decimal
+		ldi r21, 0x00				;Cargar valor del primer decimal
 		lds r20, Temp1
-		call mul16x16_16					;Llamar funcion multiplicacion
-		ldi DivisorH, 0x00					;Cargar 10 en divisor para acomodar numero
+		call mul16x16_16			;Llamar funcion multiplicacion
+		ldi DivisorH, 0x00			;Cargar 10 en divisor para acomodar numero
 		ldi DivisorL, 0x0A
-		call Division16_16					;Llamar funcion division		
-		lds r19, PotenciaH					;Cargar valor temporal de potencia
+		call Division16_16			;Llamar funcion division		
+		lds r19, PotenciaH			;Cargar valor temporal de potencia
 		lds r18, PotenciaL
-		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
-		adc r16, r18
-		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+		add r16, r18				;Sumar potencia con resultado de corriente por primer decimal
+		adc r17, r19
+		sts PotenciaH, r17			;Guardar resultado temporal de la potencia
 		sts PotenciaL, r16
 
-		lds r23, CorrienteH					;Cargar valor de corriente
+		lds r23, CorrienteH			;Cargar valor de corriente
 		lds r22, CorrienteL
-		ldi r21, 0x00						;Cargar valor del segundo decimal
+		ldi r21, 0x00				;Cargar valor del segundo decimal
 		lds r20, Temp2
-		call mul16x16_16					;Llamar funcion multiplicacion
-		ldi DivisorH, 0x00					;Cargar 100 en divisor para acomodar numero
+		call mul16x16_16			;Llamar funcion multiplicacion
+		ldi DivisorH, 0x00			;Cargar 100 en divisor para acomodar numero
 		ldi DivisorL, 0x64
-		call Division16_16					;Llamar funcion division		
-		lds r19, PotenciaH					;Cargar valor temporal de potencia
+		call Division16_16			;Llamar funcion division		
+		lds r19, PotenciaH			;Cargar valor temporal de potencia
 		lds r18, PotenciaL
-		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
-		adc r16, r18
-		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+		add r16, r18				;Sumar potencia con resultado de corriente por primer decimal
+		adc r17, r19
+		sts PotenciaH, r17			;Guardar resultado temporal de la potencia
 		sts PotenciaL, r16
 
-		lds r23, CorrienteH					;Cargar valor de corriente
+		lds r23, CorrienteH			;Cargar valor de corriente
 		lds r22, CorrienteL
-		ldi r21, 0x00						;Cargar valor del segundo decimal
+		ldi r21, 0x00				;Cargar valor del segundo decimal
 		lds r20, Temp3
-		call mul16x16_16					;Llamar funcion multiplicacion
-		ldi DivisorH, 0x03					;Cargar 1000 en divisor para acomodar numero
+		call mul16x16_16			;Llamar funcion multiplicacion
+		ldi DivisorH, 0x03			;Cargar 1000 en divisor para acomodar numero
 		ldi DivisorL, 0xE8
-		call Division16_16					;Llamar funcion division		
-		lds r19, PotenciaH					;Cargar valor temporal de potencia
+		call Division16_16			;Llamar funcion division		
+		lds r19, PotenciaH			;Cargar valor temporal de potencia
 		lds r18, PotenciaL
-		add r17, r19						;Sumar potencia con resultado de corriente por primer decimal
-		adc r16, r18
-		sts PotenciaH, r17					;Guardar resultado temporal de la potencia
+		add r16, r18				;Sumar potencia con resultado de corriente por primer decimal
+		adc r17, r19
+		sts PotenciaH, r17			;Guardar resultado de la potencia
 		sts PotenciaL, r16
 
 		ret
@@ -417,61 +607,61 @@
 
 	mul16x16_16:
 
-		mul	r22, r20				; al * bl
+		mul	r22, r20				;Multiplica parte baja de A con parte baja de B
 		movw	r17:r16, r1:r0
-		mul	r23, r20				; ah * bl
+		mul	r23, r20				;Multiplica parte alta de A con parte baja de B
 		add	r17, r0
-		mul	r21, r22				; bh * al
+		mul	r21, r22				;Multiplica parte baja de A con parte alta de B
 		add	r17, r0
-		;resultado r17, r16
+									;Resultado r17, r16
 		ret
 
 ;############################################################ FUNCION DE MULTIPLICACION DEL RESTO ###################################################################
 
 	mul16x16_24:
-		mul		r23, r21		; ah * bh
+		mul		r23, r21			;Multiplica parte alta de A con parte alta de B
 		mov		r18, r0
-		mul		r22, r20		; al * bl
+		mul		r22, r20			;Multiplica parte baja de A con parte baja de B
 		movw	r17:r16, r1:r0
-		mul		r23, r20		; ah * bl
+		mul		r23, r20			;Multiplica parte alta de A con parte baja de Bah * bl
 		add		r17, r0
 		adc		r18, r1
-		mul		r21, r22		; bh * al
+		mul		r21, r22			;Multiplica parte baja de A con parte alta de B
 		add		r17, r0
 		adc		r18, r1
-		; resultado r18, r17, r16
+									;Resultado r18, r17, r16
 		ret
 
 
 ;################################################################### FUNCION DE DIVISION ###################################################################
 
 	Division16_16:	
-		clr	RestoL					; borra byte low de Resto
-		sub	RestoH,RestoH			; borra el byte alto y acarreo
-		ldi	Contador,17				; contador de bucle infinito
+		clr	RestoL					;Borra byte low de Resto
+		sub	RestoH,RestoH			;Borra el byte alto y acarreo
+		ldi	Contador,17				;Contador de bucle infinito
 		div_1:	
-		rol	DividendoL				; desplazo a la izquierda el dividendo
+		rol	DividendoL				;Desplazo a la izquierda el dividendo
 		rol	DividendoH
-		dec	Contador				; decremento contador
+		dec	Contador				;Decremento contador
 		brne	div_2				;if done
 		sts RestodivL, RestoL
 		sts RestodivH, RestoH
-		ret							; salida
+		ret							;Salida
 		div_2:	
-		rol	RestoL					;desplazo a la izquerda el resto
+		rol	RestoL					;Resplazo a la izquerda el resto
 		rol	RestoH
-		sub	RestoL,DivisorL			;resto = resto - divisor
+		sub	RestoL,DivisorL			;Resto = resto - divisor
 		sbc	RestoH,DivisorH	
-		brcc	div_3				;si el resultado es negativo
-		add	RestoL,DivisorL			; restaurar el resto
+		brcc	div_3				;Si el resultado es negativo
+		add	RestoL,DivisorL			;Restaurar el resto
 		adc	RestoH,DivisorH
-		clc							;limpia el acarreo para ser deplazado al resultado
-		rjmp	div_1				;else
+		clc							;Limpia el acarreo para ser deplazado al resultado
+		rjmp	div_1				;Else
 		div_3:	
-		sec							;pone a 1 la bandera de acarreo para ser trasladado al resultado
+		sec							;Pone a 1 la bandera de acarreo para ser trasladado al resultado
 		rjmp	div_1
-		; resultado de la division r17, r16
-		; resto de la division r15, r14
+									;Resultado de la division r17, r16
+									;Resto de la division r15, r14
 
 ;########################################################## MOSTRAR POTENCIA #########################################################
 
@@ -670,7 +860,7 @@
 
 	USART_ESPERA:
 
-		lds r26, UCSR0A				;Espera que se limpie la bandera de transmicion
+		lds r26, UCSR0A				;Espera que se limpie la bandera de transmision
 		sbrs r26, UDRE0
 		rjmp USART_ESPERA
 		ret
@@ -709,20 +899,20 @@
 		clr rmp						;Conteo en cero
 
 	Bin2ToDigita:
-		cp ENTEROH,rBin2H			; Comparo nro con comparacion parte alta
-		brcs Bin2ToDigitc			; Si Carry=1 el nro es menor a comparacion, vuelve a rutina para comparar con un valor menor
+		cp ENTEROH,rBin2H			;Comparo nro con comparacion parte alta
+		brcs Bin2ToDigitc			;Si Carry=1 el nro es menor a comparacion, vuelve a rutina para comparar con un valor menor
 		brne Bin2ToDigitb	 
-		cp ENTEROL,rBin2L			; Si es igual, Comparo nro con comparacion parte baja
-		brcs Bin2ToDigitc			; Si Carry=1 nro menor a comparacion
+		cp ENTEROL,rBin2L			;Si es igual, Comparo nro con comparacion parte baja
+		brcs Bin2ToDigitc			;Si Carry=1 nro menor a comparacion
 
 	Bin2ToDigitb:			
-		sub ENTEROL,rBin2L			; Resto partes bajas
-		sbc ENTEROH,rBin2H			; Resto partes altas con carry
-		inc rmp						; Incremento cuenta para digito BCD
-		rjmp Bin2ToDigita			; Repito el proceso hasta que sea menor a comparacion
+		sub ENTEROL,rBin2L			;Resto partes bajas
+		sbc ENTEROH,rBin2H			;Resto partes altas con carry
+		inc rmp						;Incremento cuenta para digito BCD
+		rjmp Bin2ToDigita			;Repito el proceso hasta que sea menor a comparacion
 
 	Bin2ToDigitc:
-		st z+,rmp					; Salva el digito 
+		st z+,rmp					;Salva el digito 
 		ret
 
 ;########################################################## MOSTRAR ENTERO #########################################################
@@ -791,320 +981,210 @@
 		ret
 		call MOSTRAR_POTENCIA
 		ret
-;########################################################## INICIALIZAMOS DISPLAY #########################################################
 
-	SPI_MasterInicio:
+;############################################################# SPI ESPERA ############################################################
 
-			;/////////////////////////////////////////// SETEAR BRILLO ////////////////////////////////////////////////////////
-					
-			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			nop										;Cumplir tcss de hoja de datos MAX
-			ldi r17, 0x0A
-			out SPDR, r17							;Entrar Set Brillo MAX
-			call Esperar_TX							;Empezar la TX de información
-			nop
-			ldi r17, 0x00
-			out SPDR,r17							;Seteamos el brillo MAX al Minimo
-			call Esperar_TX							;Empezar la TX de información
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
+	SPI_ESPERA:	
+		in r26, SPSR		
+		sbrs r26, SPIF				; Esperar que se complete la transmisión
+		rjmp SPI_ESPERA
+		ret
 
-			;////////////////////////////////////// SETEAR MODOS ////////////////////////////////////////////////////////////
-
-			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			nop
-			ldi r17, 0x09
-			out SPDR, r17							;Modo decodificacion MAX7219
-			call Esperar_TX							;Empezar la TX de información
-			nop
-			ldi r17, 0x0F
-			out SPDR, r17							;Decodificar los digitos del 0 - 3
-			call Esperar_TX							;Empezar la TX de información
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
-
-			;/////////////////////////////////////////// CANTIDAD DE DIGITOS /////////////////////////////////////////////////////////////////////
-
-			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			ldi r17, 0x0B
-			out SPDR,r17							;Set SCAN Limit
-			call Esperar_TX							;Empezar la TX de información
-			nop
-			ldi r17, 0x05
-			out SPDR,r17							;Mostrar 6 digitos
-			call Esperar_TX							;Empezar la TX de información
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
-
-			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			ldi r17, 0x0C
-			out SPDR,r17							;Set de MODO
-			call Esperar_TX							;Modo Normal 
-			nop
-			ldi r17, 0x01
-			out SPDR,r17							;MODO Normal
-			call Esperar_TX							;Empezar la TX de información
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
-
-			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			ldi r17, 0x0F
-			out SPDR,r17							;Menu Modo TEST
-			call Esperar_TX							;Modo normal (No TEST)
-			nop
-			nop
-			ldi r17, 0x00
-			out SPDR,r17							;Modo Operacion Normal
-			call Esperar_TX							;Empezar la TX de información
-			nop
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
-
-			;////////////////////////////////INICIO DISPLAY TODOS LOS DIGITOS OFF //////////////////////////////////////////////////////////
-
-			/*ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			ldi r17, 0x01
-			out SPDR,r17							;Digit 0
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, 0x0F
-			out SPDR,r17							
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
-			nop
-
-			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			ldi r17, 0x02
-			out SPDR,r17							;Digit1
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, 0x0F
-			out SPDR,r17							
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
-			nop
-
-			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			ldi r17, 0x03
-			out SPDR,r17							;Digit 2
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, 0x0F
-			out SPDR,r17							
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
-			nop
-
-			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			ldi r17, 0x04
-			out SPDR,r17							;Digit 3
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, 0x0F
-			out SPDR,r17							
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
-			nop
-
-			ldi r17, (0<<PORTB0)						;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			ldi r17, 0x05
-			out SPDR,r17							;Digit 4
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, 0x00
-			out SPDR,r17							
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
-			nop
-
-			ldi r17, (0<<PORTB0)					;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			ldi r17, 0x06
-			out SPDR,r17							;Digit 5
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, 0x00
-			out SPDR,r17							
-			call Esperar_TX							
-			nop
-			nop
-			ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-			out PORTB, r17
-			nop
-			nop*/
-
-			ret
-
-	Esperar_TX:	
-			in r26, SPSR		
-			sbrs r26, SPIF							; Esperar que se complete la transmisión
-			rjmp Esperar_TX
-			
-			ret
+;############################################################# MOSTRAR TENSION MAX ############################################################
 
 	MOSTRAR_TENSION_MAX:
-			
-			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			nop
-			ldi r17, 0x06
-			out SPDR, r17							;Digito 6
-			call Esperar_TX							;Empezar la TX de información
-			nop
+				
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x06
+		out SPDR, r17				;Digito 5
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0b0011_1110
+		out SPDR,r17				; U
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
 
-			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			nop
-			ldi r17, 0b0011_1110			;Enviamos letra "U"
-			out SPDR, r17						
-			call Esperar_TX							;Empezar la TX de información
-			nop
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x05
+		out SPDR, r17				;Digito 5
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0b0000_1001
+		out SPDR,r17				; =
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
 
-			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			nop
-			ldi r17, 0x05
-			out SPDR, r17							;Digito 5
-			call Esperar_TX							;Empezar la TX de información
-			nop
+		lds ENTEROH, TensionH		;Cargar valor de tension alta
+		lds ENTEROL, TensionL		;Cargar valor de tension baja
+		call DESCOMPOSICION
+		call TRANSMITIR_MAX
+		ret
 
-			ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-			out PORTB, r17
-			nop
-			ldi r17, 0b0000_1001			;Enviamos signo "="
-			out SPDR, r17						
-			call Esperar_TX							;Empezar la TX de información
-			nop
+;############################################################# MOSTRAR CORRIENTE MAX ############################################################
+	
+	MOSTRAR_CORRIENTE_MAX:
+		
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x06
+		out SPDR, r17				;Digito 5
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0b0011_0000
+		out SPDR,r17				; I
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
 
-			call DESCOMPOSICION
-			call TRANSMITIR_MAX
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x05
+		out SPDR, r17				;Digito 5
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0b0000_1001
+		out SPDR,r17				; =
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
 
+		lds ENTEROH, CorrienteH		;Cargar valor de corriente alta
+		lds ENTEROL, CorrienteL		;Cargar valor de corriente baja
+		call DESCOMPOSICION
+		call TRANSMITIR_MAX
+		ret
+		
+;############################################################# MOSTRAR CORRIENTE MAX ############################################################
+	
+	MOSTRAR_POTENCIA_MAX:
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x06
+		out SPDR, r17				;Digito 5
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0b0110_0111
+		out SPDR,r17				; P
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
+		nop							;Cumplir tcss de hoja de datos MAX
+		ldi r17, 0x05
+		out SPDR, r17				;Digito 5
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, 0b0000_1001
+		out SPDR,r17				; =
+		call SPI_ESPERA				;Empezar la TX de información
+		nop
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
+		nop
+
+		lds ENTEROH, PotenciaH		;Cargar valor de potencia alta
+		lds ENTEROL, PotenciaL		;Cargar valor de potencia baja
+		call DESCOMPOSICION
+		call TRANSMITIR_MAX
+		ret
+		
+;############################################################# TRANSMITIR MAX ############################################################
+	
 	TRANSMITIR_MAX:
 			
-		; parte alta decimal
-
-		ldi r17, (0<<PORTB0)				;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
-		out PORTB, r17
+	;ENTERO PARTE ALTA
+		ldi r17, (0<<PC5)			;Mando 0 a PB0 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
 		nop
 		ldi r17, 0x04
-		out SPDR, r17							;Digito entero alto
-		call Esperar_TX							;Empezar la TX de información
+		out SPDR, r17				;Digito entero alto
+		call SPI_ESPERA				;Empezar la TX de información
 		nop
 
-		ld	r17, Z+								; Decena de mil
-
-		out SPDR, r17							;Envio digito entero alto
-		call Esperar_TX							;Empezar la TX de información
+		ld	r17, Z+						
+		out SPDR, r17				;Envio digito entero alto
+		call SPI_ESPERA				;Empezar la TX de información
 		nop
-		ldi r17, (1<<PORTB0)						;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
-		out PORTB, r17
+		ldi r17, (1<<PC5)			;Mando 1 a PB0 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
 		nop
 
-		;entero bajo
-
-		ldi r17, (0<<PORTB0)				;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
-		out PORTB, r17
+	;ENTERO PARTE BAJA
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
 		nop
 		ldi r17, 0x03
-		out SPDR, r17							;Digito Unidad de MIl
-		call Esperar_TX							;Empezar la TX de información
+		out SPDR, r17				;Digito entero bajo
+		call SPI_ESPERA 			;Empezar la TX de información
 		nop
 	
-		ld	r17, Z+								; Unidad de MIl
+		ld	r17, Z+						
 		ldi r16, 0xF0
-		add r17, r16							; suma para mostrar puntto decima
-		out SPDR, r17							;Envio Unidad de Mil
-		call Esperar_TX							;Empezar la TX de información
+		add r17, r16				;Suma para mostrar puntto decimal
+		out SPDR, r17				;Envio digito entero bajo
+		call SPI_ESPERA				;Empezar la TX de información
 		nop
-		ldi r17, (1<<PORTB0)						;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
-		out PORTB, r17
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
 		nop
 
-
-		; primer decimal
-
-		ldi r17, (0<<PORTB0)				;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
-		out PORTB, r17
+	;PRIMER DECIMAL
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
 		nop
 		ldi r17, 0x02
-		out SPDR, r17							;Digito Centena
-		call Esperar_TX							;Empezar la TX de información
+		out SPDR, r17				;Digito primer decimal
+		call SPI_ESPERA				;Empezar la TX de información
 		nop
 
-		ld	r17, Z+								; primer decimal
-
-		out SPDR, r17							;Envio Centena
-		call Esperar_TX							;Empezar la TX de información
+		ld	r17, Z+					;Primer decimal
+		out SPDR, r17				;Envio primer decimal
+		call SPI_ESPERA				;Empezar la TX de información
 		nop
-		ldi r17, (1<<PORTB0)				;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
-		out PORTB, r17
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
 		nop
 
-		; ultimo decimal
-
-		ldi r17, (0<<PORTB0)				;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
-		out PORTB, r17
+	;SEGUNDO DECIMAL
+		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
+		out PORTC, r17
 		nop
 		ldi r17, 0x1
-		out SPDR, r17							;Digito Decena
-		call Esperar_TX							;Empezar la TX de información
+		out SPDR, r17				;Digito segundo decimal
+		call SPI_ESPERA				;Empezar la TX de información
 		nop
 
-		ld	r17, Z+; Decena
-
-		out SPDR, r17							;Envio Decena
-		call Esperar_TX							;Empezar la TX de información
+		ld	r17, Z+					;Segundo decimal
+		out SPDR, r17				;Envio segundo decimal
+		call SPI_ESPERA				;Empezar la TX de información
 		nop
-		ldi r17, (1<<PORTB0)				;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
-		out PORTB, r17
+		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
+		out PORTC, r17
 		nop
 		
+		ld	r17, Z
 		SBIW ZL, 4
 		clr r17
 
