@@ -85,8 +85,11 @@
 	Temp1: .Byte 1
 	Temp2: .Byte 1
 	Temp3: .Byte 1
-
-
+	CorrienteH_PWM: .Byte 1
+	CorrienteL_PWM: .Byte 1
+	PotenciaH_PWM: .Byte 1
+	PotenciaL_PWM: .Byte 1
+	
 ;########################################################## VECTORES DE INTERRUPCION #########################################################
 
 .CSEG
@@ -183,6 +186,8 @@
 		call CALCULO_TENSION
 		call CALCULO_CORRIENTE
 		call CALCULO_POTENCIA
+		call CALCULO_CORRIENTE_PWM
+		call CALCULO_POTENCIA_PWM
 		call USART_COMPARACION
 		jmp BUCLE
 
@@ -196,9 +201,9 @@
 		lds r21, VAL_TensionADCL	
 		sts OCR1AL, r21
 			
-		lds r20, VAL_CorrienteADCH
+		lds r20, CorrienteH_PWM
 		sts OCR1BH, r20				;Salida PWMB timer OC1B
-		lds r20, VAL_CorrienteADCL	
+		lds r20, CorrienteL_PWM	
 		sts OCR1BL, r20
 			
 		POP_SREG					;Recupero el valor de la pila
@@ -474,7 +479,7 @@
 		lds R23, VAL_TensionADCH
 		lds R22, VAL_TensionADCL	;Carga el numero VAL_Tension en r23:r22
 		ldi R21,0x00
-		ldi R20,0x18				;Carga el numero 24 r21:r20
+		ldi R20,0x14				;Carga el numero 20 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 		sts GRANDEH, r17			;Guardamos resultado de la primer multiplicacion
 		sts GRANDEL, r16
@@ -482,18 +487,31 @@
 		lds R23, VAL_TensionADCH
 		lds R22, VAL_TensionADCL	;Carga el numero VAL_Tension en r23:r22
 		ldi R21,0x00
-		ldi R20,0x2B				;Carga el numero 43 r21:r20
+		ldi R20,0x09				;Carga el numero 9 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
-	
-		ldi	DivisorL,0x64			;El dividendo ya esta en r16 y r17
-		ldi	DivisorH,0x00			;Dividimos por 100
-		call Division16_16
-
+		
 		lds r19, GRANDEH
 		lds r18, GRANDEL
+		add r18, r16				;Sumamos primer calculo con segundo calculo
+		adc r19, r17
+		sts	TensionH, r19			;Valor de la tension
+		sts	TensionL, r18
 
-		add r19, DividendoH			;Sumamos primer calculo con segundo calculo
-		adc r18, DividendoL
+		lds R23, VAL_TensionADCH
+		lds R22, VAL_TensionADCL	;Carga el numero VAL_Tension en r23:r22
+		ldi R21,0x00
+		ldi R20,0x03				;Carga el numero 3 r21:r20
+		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
+	
+		ldi	DivisorL,0x0A			;El dividendo ya esta en r16 y r17
+		ldi	DivisorH,0x00			;Dividimos por 10
+		call Division16_16
+
+		lds r19, TensionH
+		lds r18, TensionL
+
+		add r18, DividendoL			;Sumamos primer calculo con segundo calculo
+		adc r19, DividendoH
 		sts	TensionH, r19			;Valor de la tension real
 		sts	TensionL, r18
 		ret
@@ -504,21 +522,32 @@
 
 		lds r23, VAL_CorrienteADCH	;Carga valores del ADC
 		lds r22, VAL_CorrienteADCL
-		ldi r24, 0x01				;Carga complemento de 511 para restar
-		ldi r25, 0xFE
-		add r22, r24				;Realiza suma (resta)
-		adc r23, r25
-		ldi r23, 0x00				;Ponemos 0 en la parte alta del resultado
-		ldi r21, 0x02				;Carga 587 (factor para adecuar la medicion) para multiplicar
-		ldi r20, 0x4B
-		call mul16x16_16			;Llama funcion multiplicacion
-
+		ldi R21,0x00
+		ldi R20,0x1F				;Carga el numero 31 r21:r20
+		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 		ldi DivisorH, 0x00			;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
 		ldi DivisorL, 0x0A
 		call Division16_16			;Llama funcion division
+		sts GRANDEH, r17			;Guardamos resultado de la primer multiplicacion
+		sts GRANDEL, r16
 
-		sts CorrienteH, r17			;Resultado corriente
-		sts CorrienteL, r16				
+		lds r23, VAL_CorrienteADCH	;Carga valores del ADC
+		lds r22, VAL_CorrienteADCL
+		ldi R21,0x00
+		ldi R20,0x15				;Carga el numero 21 r21:r20
+		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
+		ldi DivisorH, 0x03			;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
+		ldi DivisorL, 0xE8
+		call Division16_16			;Llama funcion division
+
+		lds r19, GRANDEH
+		lds r18, GRANDEL
+
+		add r19, DividendoH			;Sumamos primer calculo con segundo calculo
+		adc r18, DividendoL
+		sts CorrienteH, r19			;Resultado corriente
+		sts CorrienteL, r18
+		 				
 		ret
 
 ;################################################################### CALCULO DE POTENCIA ###################################################################
@@ -601,6 +630,113 @@
 		sts PotenciaH, r17			;Guardar resultado de la potencia
 		sts PotenciaL, r16
 
+		ret
+
+;################################################################### CALCULO DE CORRIENTE PWM ###################################################################
+ 
+	CALCULO_CORRIENTE_PWM:
+		
+		lds r23, CorrienteH			;Valor corriente
+		lds r22, CorrienteL	
+		ldi r21, 0x00				;Multiplicar por 2
+		ldi r20, 0x02
+		call mul16x16_16
+		ldi r19, 0x00				;dividir por 10
+		ldi r18, 0x0A
+		call Division16_16
+		sts CorrienteH_PWM, r17
+		sts CorrienteL_PWM, r16
+
+		lds r23, CorrienteH			;Valor corriente
+		lds r22, CorrienteL	
+		ldi r21, 0x00				;Multiplicar por 2
+		ldi r20, 0x07
+		call mul16x16_16
+		ldi r19, 0x00				;dividir por 10
+		ldi r18, 0x64
+		call Division16_16
+		lds r20, CorrienteH_PWM
+		lds r19, CorrienteL_PWM
+		add r16, r19
+		adc r17, r20
+		sts CorrienteH_PWM, r17
+		sts CorrienteL_PWM, r16
+
+		lds r23, CorrienteH			;Valor corriente
+		lds r22, CorrienteL	
+		ldi r21, 0x00				;Multiplicar por 2
+		ldi r20, 0x02
+		call mul16x16_16
+		ldi r19, 0x03				;dividir por 10
+		ldi r18, 0xE8
+		call Division16_16
+		lds r20, CorrienteH_PWM
+		lds r19, CorrienteL_PWM
+		add r16, r19
+		adc r17, r20
+		ldi r20, 0x00
+		ldi r19, 0xCF
+		add r16, r19
+		adc r17, r20
+		sts CorrienteH_PWM, r17
+		sts CorrienteL_PWM, r16
+		
+		ret
+
+;################################################################### CALCULO DE POTENCIA PWM ###################################################################
+ 
+	CALCULO_POTENCIA_PWM:
+		
+		lds DividendoH, PotenciaH	;Cargar valor de potencia
+		lds DividendoL, PotenciaL
+		ldi DivisorH, 0x00			;Cargar 10 en divisor
+		ldi DivisorL, 0x0A
+		call Division16_16			;Llamar funcion division
+		sts GRANDEH, r17			;Guardar resultado
+		sts GRANDEL, r16
+
+		lds r17, GRANDEH			;Valor de potencia hasta 6000
+		lds r16, GRANDEL	
+		ldi r19, 0x00				;dividir por 10
+		ldi r18, 0x0A
+		call Division16_16
+		sts PotenciaH_PWM, r17
+		sts PotenciaL_PWM, r16
+
+		lds r23, GRANDEH			;Valor corriente
+		lds r22, GRANDEL	
+		ldi r21, 0x00				;Multiplicar por 2
+		ldi r20, 0x03
+		call mul16x16_16
+		ldi r19, 0x00				;dividir por 100
+		ldi r18, 0x64
+		call Division16_16
+		lds r20, PotenciaH_PWM
+		lds r19, PotenciaL_PWM
+		add r16, r19
+		adc r17, r20
+		sts PotenciaH_PWM, r17
+		sts PotenciaL_PWM, r16
+
+		lds r23, GRANDEH			;Valor corriente
+		lds r22, GRANDEL	
+		ldi r21, 0x00				;Multiplicar por 2
+		ldi r20, 0x06
+		call mul16x16_16
+		ldi r19, 0x03				;dividir por 1000
+		ldi r18, 0xE8
+		call Division16_16
+		lds r20, PotenciaH_PWM
+		lds r19, PotenciaL_PWM
+		add r16, r19
+		adc r17, r20
+		ldi r20, 0x00
+		ldi r19, 0xCF				;Sumar 1 volt
+		add r16, r19
+		adc r17, r20
+		sts PotenciaH_PWM, r17
+		sts PotenciaL_PWM, r16
+		
 		ret
 		
 ;################################################################### FUNCION DE MULTIPLICACION ###################################################################
