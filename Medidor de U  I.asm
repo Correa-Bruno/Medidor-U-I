@@ -653,10 +653,10 @@
 
 		lds r23, CorrienteH			;Valor corriente
 		lds r22, CorrienteL	
-		ldi r21, 0x00				;Multiplicar por 2
+		ldi r21, 0x00				;Multiplicar por 7
 		ldi r20, 0x07
 		call mul16x16_16
-		ldi r19, 0x00				;dividir por 10
+		ldi r19, 0x00				;dividir por 100
 		ldi r18, 0x64
 		call Division16_16
 		lds r20, CorrienteH_PWM
@@ -668,10 +668,10 @@
 
 		lds r23, CorrienteH			;Valor corriente
 		lds r22, CorrienteL	
-		ldi r21, 0x00				;Multiplicar por 2
-		ldi r20, 0x02
+		ldi r21, 0x00				;Multiplicar por 3
+		ldi r20, 0x03
 		call mul16x16_16
-		ldi r19, 0x03				;dividir por 10
+		ldi r19, 0x03				;dividir por 1000
 		ldi r18, 0xE8
 		call Division16_16
 		lds r20, CorrienteH_PWM
@@ -679,7 +679,7 @@
 		add r16, r19
 		adc r17, r20
 		ldi r20, 0x00
-		ldi r19, 0xCF
+		ldi r19, 0xCC				; SUMA 204 para llegar a 5V
 		add r16, r19
 		adc r17, r20
 		sts CorrienteH_PWM, r17
@@ -709,7 +709,7 @@
 
 		lds r23, GRANDEH			;Valor corriente
 		lds r22, GRANDEL	
-		ldi r21, 0x00				;Multiplicar por 2
+		ldi r21, 0x00				;Multiplicar por 3
 		ldi r20, 0x03
 		call mul16x16_16
 		ldi r19, 0x00				;dividir por 100
@@ -724,7 +724,7 @@
 
 		lds r23, GRANDEH			;Valor corriente
 		lds r22, GRANDEL	
-		ldi r21, 0x00				;Multiplicar por 2
+		ldi r21, 0x00				;Multiplicar por 6
 		ldi r20, 0x06
 		call mul16x16_16
 		ldi r19, 0x03				;dividir por 1000

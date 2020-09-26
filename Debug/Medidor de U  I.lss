@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm Sat Sep 26 11:56:27 2020
+AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Sistemas Digitales IV\Trabajo Final\SDIV-ASMBL\Medidor de U  I.asm Sat Sep 26 12:18:54 2020
 
 [builtin](2): Including file 'C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include\m328Pdef.inc'
                  
@@ -1704,10 +1704,10 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
                  
 0002a2 9170 0108 		lds r23, CorrienteH			;Valor corriente
 0002a4 9160 0109 		lds r22, CorrienteL	
-0002a6 e050      		ldi r21, 0x00				;Multiplicar por 2
+0002a6 e050      		ldi r21, 0x00				;Multiplicar por 7
 0002a7 e047      		ldi r20, 0x07
 0002a8 940e 031c 		call mul16x16_16
-0002aa e030      		ldi r19, 0x00				;dividir por 10
+0002aa e030      		ldi r19, 0x00				;dividir por 100
 0002ab e624      		ldi r18, 0x64
 0002ac 940e 032e 		call Division16_16
 0002ae 9140 0117 		lds r20, CorrienteH_PWM
@@ -1719,10 +1719,10 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
                  
 0002b8 9170 0108 		lds r23, CorrienteH			;Valor corriente
 0002ba 9160 0109 		lds r22, CorrienteL	
-0002bc e050      		ldi r21, 0x00				;Multiplicar por 2
-0002bd e042      		ldi r20, 0x02
+0002bc e050      		ldi r21, 0x00				;Multiplicar por 3
+0002bd e043      		ldi r20, 0x03
 0002be 940e 031c 		call mul16x16_16
-0002c0 e033      		ldi r19, 0x03				;dividir por 10
+0002c0 e033      		ldi r19, 0x03				;dividir por 1000
 0002c1 ee28      		ldi r18, 0xE8
 0002c2 940e 032e 		call Division16_16
 0002c4 9140 0117 		lds r20, CorrienteH_PWM
@@ -1730,7 +1730,7 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
 0002c8 0f03      		add r16, r19
 0002c9 1f14      		adc r17, r20
 0002ca e040      		ldi r20, 0x00
-0002cb ec3f      		ldi r19, 0xCF
+0002cb ec3c      		ldi r19, 0xCC				; SUMA 204 para llegar a 5V
 0002cc 0f03      		add r16, r19
 0002cd 1f14      		adc r17, r20
 0002ce 9310 0117 		sts CorrienteH_PWM, r17
@@ -1760,7 +1760,7 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
                  
 0002eb 9170 0112 		lds r23, GRANDEH			;Valor corriente
 0002ed 9160 0113 		lds r22, GRANDEL	
-0002ef e050      		ldi r21, 0x00				;Multiplicar por 2
+0002ef e050      		ldi r21, 0x00				;Multiplicar por 3
 0002f0 e043      		ldi r20, 0x03
 0002f1 940e 031c 		call mul16x16_16
 0002f3 e030      		ldi r19, 0x00				;dividir por 100
@@ -1775,7 +1775,7 @@ AVRASM ver. 2.1.57  C:\Users\crist\Desktop\Kituu\Uader\2 Año - 2 Cuatrimestre\Si
                  
 000301 9170 0112 		lds r23, GRANDEH			;Valor corriente
 000303 9160 0113 		lds r22, GRANDEL	
-000305 e050      		ldi r21, 0x00				;Multiplicar por 2
+000305 e050      		ldi r21, 0x00				;Multiplicar por 6
 000306 e046      		ldi r20, 0x06
 000307 940e 031c 		call mul16x16_16
 000309 e033      		ldi r19, 0x03				;dividir por 1000
