@@ -182,9 +182,13 @@
 		
 	BUCLE:
 		call ADC0
-		call ADC1
-		call CALCULO_TENSION
+		nop
+		nop
 		call CALCULO_CORRIENTE
+		call ADC1
+		nop
+		nop
+		call CALCULO_TENSION
 		call CALCULO_POTENCIA
 		call CALCULO_CORRIENTE_PWM
 		call CALCULO_POTENCIA_PWM
@@ -196,14 +200,14 @@
 	RTI_TIMER1_OVF:			
 		PUSH_SREG					;Guardo en la pila la posicion de memoria
 								
-		lds r21, VAL_TensionADCH
-		sts OCR1AH, r21				;Salida PWMA timer OC1A
-		lds r21, VAL_TensionADCL	
+		lds r21, PotenciaH_PWM
+		sts OCR1AH, r21				;Salida PWMA timer OC1A (Pin 9)
+		lds r21, PotenciaL_PWM	
 		sts OCR1AL, r21
 			
 		lds r20, CorrienteH_PWM
-		sts OCR1BH, r20				;Salida PWMB timer OC1B
-		lds r20, CorrienteL_PWM	
+		sts OCR1BH, r20				;Salida PWMB timer OC1B (Pin 10)
+		lds r20, CorrienteL_PWM
 		sts OCR1BL, r20
 			
 		POP_SREG					;Recupero el valor de la pila
@@ -479,7 +483,7 @@
 		lds R23, VAL_TensionADCH
 		lds R22, VAL_TensionADCL	;Carga el numero VAL_Tension en r23:r22
 		ldi R21,0x00
-		ldi R20,0x14				;Carga el numero 20 r21:r20
+		ldi R20,0x13				;Carga el numero 19 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 		sts GRANDEH, r17			;Guardamos resultado de la primer multiplicacion
 		sts GRANDEL, r16
@@ -487,7 +491,7 @@
 		lds R23, VAL_TensionADCH
 		lds R22, VAL_TensionADCL	;Carga el numero VAL_Tension en r23:r22
 		ldi R21,0x00
-		ldi R20,0x09				;Carga el numero 9 r21:r20
+		ldi R20,0x05				;Carga el numero 5 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 		
 		lds r19, GRANDEH
@@ -523,28 +527,28 @@
 		lds r23, VAL_CorrienteADCH	;Carga valores del ADC
 		lds r22, VAL_CorrienteADCL
 		ldi R21,0x00
-		ldi R20,0x1F				;Carga el numero 31 r21:r20
+		ldi R20,0x1D				;Carga el numero 29 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 		ldi DivisorH, 0x00			;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
 		ldi DivisorL, 0x0A
 		call Division16_16			;Llama funcion division
-		sts GRANDEH, r17			;Guardamos resultado de la primer multiplicacion
+		sts GRANDEH, r17			;Guardamos resultado de la primer multiplicacion 2969
 		sts GRANDEL, r16
 
 		lds r23, VAL_CorrienteADCH	;Carga valores del ADC
 		lds r22, VAL_CorrienteADCL
 		ldi R21,0x00
-		ldi R20,0x15				;Carga el numero 21 r21:r20
+		ldi R20,0x1D				;Carga el numero 29 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
-		ldi DivisorH, 0x03			;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
+		ldi DivisorH, 0x03			;Carga 1000 en el divisor (para obtener nuestro factor >> 0.0587)
 		ldi DivisorL, 0xE8
 		call Division16_16			;Llama funcion division
 
 		lds r19, GRANDEH
 		lds r18, GRANDEL
 
-		add r19, DividendoH			;Sumamos primer calculo con segundo calculo
-		adc r18, DividendoL
+		add r18, DividendoL			;Sumamos primer calculo con segundo calculo
+		adc r19, DividendoH
 		sts CorrienteH, r19			;Resultado corriente
 		sts CorrienteL, r18
 		 				
