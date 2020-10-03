@@ -48,45 +48,45 @@
   <INICIO><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>116</LINE></INICIO>
   <RTI_SELECT><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>404</LINE></RTI_SELECT>
   <RTI_TIMER1_OVF><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>201</LINE></RTI_TIMER1_OVF>
-  <USART_RXC><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>996</LINE></USART_RXC>
+  <USART_RXC><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1000</LINE></USART_RXC>
   <CONFIG_MAX><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>219</LINE></CONFIG_MAX>
   <BUCLE><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>184</LINE></BUCLE>
   <ADC0><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>426</LINE></ADC0>
-  <RETARDO><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1367</LINE></RETARDO>
-  <CALCULO_CORRIENTE><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>530</LINE></CALCULO_CORRIENTE>
+  <RETARDO><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1371</LINE></RETARDO>
+  <CALCULO_CORRIENTE><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>534</LINE></CALCULO_CORRIENTE>
   <ADC1><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>456</LINE></ADC1>
   <CALCULO_TENSION><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>486</LINE></CALCULO_TENSION>
-  <CALCULO_POTENCIA><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>564</LINE></CALCULO_POTENCIA>
-  <SELECT_Magnitud><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1354</LINE></SELECT_Magnitud>
-  <CALCULO_CORRIENTE_PWM><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>646</LINE></CALCULO_CORRIENTE_PWM>
-  <CALCULO_POTENCIA_PWM><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>697</LINE></CALCULO_POTENCIA_PWM>
-  <USART_COMPARACION><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1111</LINE></USART_COMPARACION>
-  <SPI_ESPERA><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1132</LINE></SPI_ESPERA>
+  <CALCULO_POTENCIA><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>568</LINE></CALCULO_POTENCIA>
+  <SELECT_Magnitud><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1358</LINE></SELECT_Magnitud>
+  <CALCULO_CORRIENTE_PWM><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>650</LINE></CALCULO_CORRIENTE_PWM>
+  <CALCULO_POTENCIA_PWM><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>701</LINE></CALCULO_POTENCIA_PWM>
+  <USART_COMPARACION><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1115</LINE></USART_COMPARACION>
+  <SPI_ESPERA><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1136</LINE></SPI_ESPERA>
   <LEER_ADC0><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>441</LINE></LEER_ADC0>
   <LEER_ADC1><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>471</LINE></LEER_ADC1>
-  <mul16x16_16><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>753</LINE></mul16x16_16>
-  <Division16_16><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>783</LINE></Division16_16>
-  <mul16x16_24><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>766</LINE></mul16x16_24>
-  <div_1><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>787</LINE></div_1>
-  <div_2><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>795</LINE></div_2>
-  <div_3><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>805</LINE></div_3>
-  <MOSTRAR_POTENCIA><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>813</LINE></MOSTRAR_POTENCIA>
-  <DESCOMPOSICION><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1015</LINE></DESCOMPOSICION>
-  <USART_ESPERA><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1006</LINE></USART_ESPERA>
-  <MOSTRAR><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1065</LINE></MOSTRAR>
-  <MOSTRAR_CORRIENTE><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>873</LINE></MOSTRAR_CORRIENTE>
-  <MOSTRAR_TENSION><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>937</LINE></MOSTRAR_TENSION>
-  <Bin2ToDigit><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1043</LINE></Bin2ToDigit>
-  <Bin2ToDigita><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1046</LINE></Bin2ToDigita>
-  <Bin2ToDigitc><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1059</LINE></Bin2ToDigitc>
-  <Bin2ToDigitb><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1053</LINE></Bin2ToDigitb>
-  <I><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1118</LINE></I>
-  <P><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1123</LINE></P>
-  <MOSTRAR_TENSION_MAX><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1140</LINE></MOSTRAR_TENSION_MAX>
-  <TRANSMITIR_MAX><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1269</LINE></TRANSMITIR_MAX>
-  <MOSTRAR_CORRIENTE_MAX><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1183</LINE></MOSTRAR_CORRIENTE_MAX>
-  <MOSTRAR_POTENCIA_MAX><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1226</LINE></MOSTRAR_POTENCIA_MAX>
-  <WGLOOP0><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1371</LINE></WGLOOP0>
-  <WGLOOP1><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1372</LINE></WGLOOP1>
+  <mul16x16_16><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>757</LINE></mul16x16_16>
+  <Division16_16><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>787</LINE></Division16_16>
+  <mul16x16_24><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>770</LINE></mul16x16_24>
+  <div_1><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>791</LINE></div_1>
+  <div_2><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>799</LINE></div_2>
+  <div_3><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>809</LINE></div_3>
+  <MOSTRAR_POTENCIA><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>817</LINE></MOSTRAR_POTENCIA>
+  <DESCOMPOSICION><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1019</LINE></DESCOMPOSICION>
+  <USART_ESPERA><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1010</LINE></USART_ESPERA>
+  <MOSTRAR><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1069</LINE></MOSTRAR>
+  <MOSTRAR_CORRIENTE><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>877</LINE></MOSTRAR_CORRIENTE>
+  <MOSTRAR_TENSION><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>941</LINE></MOSTRAR_TENSION>
+  <Bin2ToDigit><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1047</LINE></Bin2ToDigit>
+  <Bin2ToDigita><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1050</LINE></Bin2ToDigita>
+  <Bin2ToDigitc><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1063</LINE></Bin2ToDigitc>
+  <Bin2ToDigitb><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1057</LINE></Bin2ToDigitb>
+  <I><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1122</LINE></I>
+  <P><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1127</LINE></P>
+  <MOSTRAR_TENSION_MAX><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1144</LINE></MOSTRAR_TENSION_MAX>
+  <TRANSMITIR_MAX><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1273</LINE></TRANSMITIR_MAX>
+  <MOSTRAR_CORRIENTE_MAX><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1187</LINE></MOSTRAR_CORRIENTE_MAX>
+  <MOSTRAR_POTENCIA_MAX><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1230</LINE></MOSTRAR_POTENCIA_MAX>
+  <WGLOOP0><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1375</LINE></WGLOOP0>
+  <WGLOOP1><FILE>C:\Users\matias gonzalo\Desktop\TRABAJO FINAL SISTEMAS DIGITALES IV\multimedidor de tension\Medidor de U  I.asm</FILE><LINE>1376</LINE></WGLOOP1>
  </LABELS>
 </ASSEMBLER_INFO>

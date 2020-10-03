@@ -143,7 +143,7 @@
 ;########################################################## CONFIGURACION DE TIMER/COMP 1 #########################################################
 		
 		ldi r16, (1<<COM1A1)|(0<<COM1A0)|(1<<COM1B1)|(0<<COM1B0)|(1<<WGM11)|(1<<WGM10) 
-		sts TCCR1A, r16				;Modo fase correcta PWM, comparacion igual no invertido, resolucion 10-bit
+		sts TCCR1A, r16				;Modo fast PWM, comparacion igual no invertido, resolucion 10-bit
 		ldi r16, (1<<WGM12)|(0<<WGM13)|(0<<CS12)|(1<<CS11)|(0<<CS10)  
 		sts TCCR1B, r16				;Selector de reloj de timer/counter: Clock_I-O/8(from prescaler)
 
@@ -248,7 +248,7 @@
 		call SPI_ESPERA				;Empezar la TX de información
 		nop
 		ldi r17, 0x0F
-		out SPDR,r17				;Setear Code B decode for digits 3–0 No decode for digits 7–4
+		out SPDR,r17				;deSetear Code B deco for digits 3–0 No decode for digits 7–4
 		call SPI_ESPERA				;Empezar la TX de información
 		nop
 		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
@@ -436,7 +436,7 @@
 		sts ADCSRA, r16				;Prescaler en 128, Habilito ADC
 		
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Leer ADC1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Leer ADC0 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	LEER_ADC0:
 
@@ -499,6 +499,10 @@
 		ldi R20,0x05				;Carga el numero 5 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 		
+		ldi	DivisorL,0x0A			;El dividendo ya esta en r16 y r17
+		ldi	DivisorH,0x00			;Dividimos por 10
+		call Division16_16
+
 		lds r19, GRANDEH
 		lds r18, GRANDEL
 		add r18, r16				;Sumamos primer calculo con segundo calculo
@@ -512,8 +516,8 @@
 		ldi R20,0x03				;Carga el numero 3 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 	
-		ldi	DivisorL,0x0A			;El dividendo ya esta en r16 y r17
-		ldi	DivisorH,0x00			;Dividimos por 10
+		ldi	DivisorL,0x64			;El dividendo ya esta en r16 y r17
+		ldi	DivisorH,0x00			;Dividimos por 100
 		call Division16_16
 
 		lds r19, TensionH
@@ -658,10 +662,10 @@
 
 		lds r23, CorrienteH			;Valor corriente
 		lds r22, CorrienteL	
-		ldi r21, 0x00				;Multiplicar por 2
+		ldi r21, 0x00				;Multiplicar por 7
 		ldi r20, 0x07
 		call mul16x16_16
-		ldi r19, 0x00				;dividir por 10
+		ldi r19, 0x00				;dividir por 100
 		ldi r18, 0x64
 		call Division16_16
 		lds r20, CorrienteH_PWM
@@ -674,7 +678,7 @@
 		lds r23, CorrienteH			;Valor corriente
 		lds r22, CorrienteL	
 		ldi r21, 0x00				;Multiplicar por 2
-		ldi r20, 0x02
+		ldi r20, 0x03
 		call mul16x16_16
 		ldi r19, 0x03				;dividir por 10
 		ldi r18, 0xE8
@@ -684,7 +688,7 @@
 		add r16, r19
 		adc r17, r20
 		ldi r20, 0x00
-		ldi r19, 0xCF
+		ldi r19, 0xCC
 		add r16, r19
 		adc r17, r20
 		sts CorrienteH_PWM, r17
