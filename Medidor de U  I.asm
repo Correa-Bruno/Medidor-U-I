@@ -89,7 +89,8 @@
 	CorrienteL_PWM: .Byte 1
 	PotenciaH_PWM: .Byte 1
 	PotenciaL_PWM: .Byte 1
-	
+	SELECT: .Byte 1
+
 ;########################################################## VECTORES DE INTERRUPCION #########################################################
 
 .CSEG
@@ -182,13 +183,17 @@
 		
 	BUCLE:
 		call ADC0
-		call ADC1
-		call CALCULO_TENSION
+		call RETARDO
 		call CALCULO_CORRIENTE
+		call ADC1
+		call RETARDO
+		call CALCULO_TENSION
 		call CALCULO_POTENCIA
+		call SELECT_Magnitud
 		call CALCULO_CORRIENTE_PWM
 		call CALCULO_POTENCIA_PWM
 		call USART_COMPARACION
+		
 		jmp BUCLE
 
 ;########################################################## TRATAMIENTO DE INTERRUPCION DEL TIMER1 (salidas PWM 1-5 V) #########################################################
@@ -196,14 +201,14 @@
 	RTI_TIMER1_OVF:			
 		PUSH_SREG					;Guardo en la pila la posicion de memoria
 								
-		lds r21, VAL_TensionADCH
-		sts OCR1AH, r21				;Salida PWMA timer OC1A
-		lds r21, VAL_TensionADCL	
+		lds r21, PotenciaH_PWM
+		sts OCR1AH, r21				;Salida PWMA timer OC1A (Pin 9)
+		lds r21, PotenciaL_PWM	
 		sts OCR1AL, r21
 			
 		lds r20, CorrienteH_PWM
-		sts OCR1BH, r20				;Salida PWMB timer OC1B
-		lds r20, CorrienteL_PWM	
+		sts OCR1BH, r20				;Salida PWMB timer OC1B (Pin 10)
+		lds r20, CorrienteL_PWM
 		sts OCR1BL, r20
 			
 		POP_SREG					;Recupero el valor de la pila
@@ -397,16 +402,22 @@
 ;########################################################## INTERRUPCION POR PCINT0 #########################################################
 
 	RTI_SELECT:
+		
 		PUSH_SREG
-
+		
+		ldi r17, 0xFF				;Ponemos todo el registro en 1
 		in r16, PIND
 		sbrs r16, 7					;Pregunta si PD7 esta en 0
-		call MOSTRAR_POTENCIA_MAX	;Llama funcion para mostrar potencia
-		sbrs r16, 6					;Pregunta si PD6 esta en 0
-		call MOSTRAR_CORRIENTE_MAX	;Llama funcion para mostrar potencia
+		ldi r17, 0b0111_1111		;Carga 0 en el bit 7
+
+		sbrs r16, 6					;Pregunta si PD6 esta en 0 
+		ldi r17, 0b1011_1111		;Carga 0 en el bit 6
+
 		sbrs r16, 5					;Pregunta si PD5 esta en 0
-		call MOSTRAR_TENSION_MAX	;Llama funcion para mostrar tension
-			
+		ldi r17, 0b1101_1111		;Carga 0 en el bit 5
+
+		sts SELECT, r17				;Guarda valor en variable
+		
 		POP_SREG
 		reti
 
@@ -421,10 +432,9 @@
 		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Iniciar conversion ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-		ldi r16, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) 
-		sts ADCSRA, r16				;Prescaler en 8, Habilito ADC, Int de conversion completa(ADIE), Activacion auto del ADC(ADATE)
-		ldi r16, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	
-		sts ADCSRB, r16				;Timer/Counter1 Overflow
+		ldi r16, (1<<ADEN)|(1<<ADSC)|(0<<ADIE)|(0<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) 
+		sts ADCSRA, r16				;Prescaler en 128, Habilito ADC
+		
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Leer ADC1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -438,7 +448,7 @@
 		lds r16, ADCH				;Cargar parte alta del ADC
 		sts VAL_CorrienteADCL, r17	;Guardar el valor de ADC en VAL_CorrienteADC
 		sts VAL_CorrienteADCH, r16
-	
+		
 		ret
 			
 ;################################################################### SUBRUTINA PARA LEER ADC1 ###################################################################
@@ -452,10 +462,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Iniciar conversion ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-		ldi r18, (1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) 
-		sts ADCSRA, r18				;Prescaler en 8, Habilito ADC, Int de conversion completa(ADIE), Activacion auto del ADC(ADATE)  
-		ldi r18, (1<<ADTS2)|(1<<ADTS1)|(0<<ADTS0)	
-		sts ADCSRB, r18				;Timer/Counter1 Overflow
+		ldi r18, (1<<ADEN)|(1<<ADSC)|(0<<ADIE)|(0<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) 
+		sts ADCSRA, r18				;Prescaler en 128, Habilito ADC  
+		
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Leer ADC1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -469,7 +478,7 @@
 		lds r19, ADCH				;Cargar parte alta del ADC
 		sts VAL_TensionADCL, r18	;Guardar el valor de ADC en VAL_TensionADC
 		sts VAL_TensionADCH, r19
-	
+		
 		ret	
 
 ;################################################################### CALCULO DE TENSION ###################################################################
@@ -479,7 +488,7 @@
 		lds R23, VAL_TensionADCH
 		lds R22, VAL_TensionADCL	;Carga el numero VAL_Tension en r23:r22
 		ldi R21,0x00
-		ldi R20,0x14				;Carga el numero 20 r21:r20
+		ldi R20,0x13				;Carga el numero 19 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 		sts GRANDEH, r17			;Guardamos resultado de la primer multiplicacion
 		sts GRANDEL, r16
@@ -487,7 +496,7 @@
 		lds R23, VAL_TensionADCH
 		lds R22, VAL_TensionADCL	;Carga el numero VAL_Tension en r23:r22
 		ldi R21,0x00
-		ldi R20,0x09				;Carga el numero 9 r21:r20
+		ldi R20,0x05				;Carga el numero 5 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 		
 		lds r19, GRANDEH
@@ -523,28 +532,28 @@
 		lds r23, VAL_CorrienteADCH	;Carga valores del ADC
 		lds r22, VAL_CorrienteADCL
 		ldi R21,0x00
-		ldi R20,0x1F				;Carga el numero 31 r21:r20
+		ldi R20,0x1D				;Carga el numero 29 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
 		ldi DivisorH, 0x00			;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
 		ldi DivisorL, 0x0A
 		call Division16_16			;Llama funcion division
-		sts GRANDEH, r17			;Guardamos resultado de la primer multiplicacion
+		sts GRANDEH, r17			;Guardamos resultado de la primer multiplicacion 2969
 		sts GRANDEL, r16
 
 		lds r23, VAL_CorrienteADCH	;Carga valores del ADC
 		lds r22, VAL_CorrienteADCL
 		ldi R21,0x00
-		ldi R20,0x15				;Carga el numero 21 r21:r20
+		ldi R20,0x1D				;Carga el numero 29 r21:r20
 		call mul16x16_16			;Llamado a rutina de multiplicacion de 16 bits x 16 bits
-		ldi DivisorH, 0x03			;Carga 10 en el divisor (para obtener nuestro factor >> 0.0587)
+		ldi DivisorH, 0x03			;Carga 1000 en el divisor (para obtener nuestro factor >> 0.0587)
 		ldi DivisorL, 0xE8
 		call Division16_16			;Llama funcion division
 
 		lds r19, GRANDEH
 		lds r18, GRANDEL
 
-		add r19, DividendoH			;Sumamos primer calculo con segundo calculo
-		adc r18, DividendoL
+		add r18, DividendoL			;Sumamos primer calculo con segundo calculo
+		adc r19, DividendoH
 		sts CorrienteH, r19			;Resultado corriente
 		sts CorrienteL, r18
 		 				
@@ -1164,6 +1173,9 @@
 		lds ENTEROL, TensionL		;Cargar valor de tension baja
 		call DESCOMPOSICION
 		call TRANSMITIR_MAX
+		
+		ldi r17, 0xFF
+		sts SELECT, r17
 		ret
 
 ;############################################################# MOSTRAR CORRIENTE MAX ############################################################
@@ -1204,6 +1216,9 @@
 		lds ENTEROL, CorrienteL		;Cargar valor de corriente baja
 		call DESCOMPOSICION
 		call TRANSMITIR_MAX
+
+		ldi r17, 0xFF
+		sts SELECT, r17
 		ret
 		
 ;############################################################# MOSTRAR CORRIENTE MAX ############################################################
@@ -1244,6 +1259,9 @@
 		lds ENTEROL, PotenciaL		;Cargar valor de potencia baja
 		call DESCOMPOSICION
 		call TRANSMITIR_MAX
+		
+		ldi r17, 0xFF
+		sts SELECT, r17
 		ret
 		
 ;############################################################# TRANSMITIR MAX ############################################################
@@ -1271,17 +1289,19 @@
 		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
 		out PORTC, r17
 		nop
+
 		ldi r17, 0x03
 		out SPDR, r17				;Digito entero bajo
 		call SPI_ESPERA 			;Empezar la TX de información
 		nop
-	
+
 		ld	r17, Z+						
 		ldi r16, 0xF0
 		add r17, r16				;Suma para mostrar puntto decimal
 		out SPDR, r17				;Envio digito entero bajo
 		call SPI_ESPERA				;Empezar la TX de información
 		nop
+		
 		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
 		out PORTC, r17
 		nop
@@ -1290,6 +1310,7 @@
 		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
 		out PORTC, r17
 		nop
+
 		ldi r17, 0x02
 		out SPDR, r17				;Digito primer decimal
 		call SPI_ESPERA				;Empezar la TX de información
@@ -1307,6 +1328,7 @@
 		ldi r17, (0<<PC5)			;Mando 0 a PC5 para indicarle a MAX que inicia transferencia de datos
 		out PORTC, r17
 		nop
+
 		ldi r17, 0x1
 		out SPDR, r17				;Digito segundo decimal
 		call SPI_ESPERA				;Empezar la TX de información
@@ -1316,12 +1338,45 @@
 		out SPDR, r17				;Envio segundo decimal
 		call SPI_ESPERA				;Empezar la TX de información
 		nop
+
 		ldi r17, (1<<PC5)			;Mando 1 a PC5 para indicarle a MAX que finalizo transferencia
 		out PORTC, r17
 		nop
-		
+
 		ld	r17, Z
 		SBIW ZL, 4
 		clr r17
 
 		ret
+
+;############################################################# SUBRUTINA PARA MOSTRAR MAX ############################################################
+
+	SELECT_Magnitud:
+		
+		lds r16, SELECT
+		sbrs r16, 7					;Pregunta si PD7 esta en 0
+		call MOSTRAR_POTENCIA_MAX	;Llama funcion para mostrar potencia
+		sbrs r16, 6					;Pregunta si PD6 esta en 0
+		call MOSTRAR_CORRIENTE_MAX	;Llama funcion para mostrar potencia
+		sbrs r16, 5					;Pregunta si PD5 esta en 0
+		call MOSTRAR_TENSION_MAX	;Llama funcion para mostrar tension	
+
+		ret
+
+;############################################################# SUBRUTINA RETARDO 100us ############################################################
+	RETARDO:
+		
+		; delaying 1599 cycles:
+				  ldi  R17, $0D
+		WGLOOP0:  ldi  R18, $28
+		WGLOOP1:  dec  R18
+				  brne WGLOOP1
+				  dec  R17
+				  brne WGLOOP0
+		; ----------------------------- 
+		; delaying 1 cycle:
+				  nop
+
+				  ret
+		; =============================
+			
